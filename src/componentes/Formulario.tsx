@@ -1,0 +1,41 @@
+"use client";
+
+import { useActionState, type ReactNode } from "react";
+import { estadoInicial, type EstadoDoForm } from "@/acoes/estado";
+
+/**
+ * Form ligado a uma Server Action com useActionState: mostra o erro devolvido
+ * e desabilita o botão enquanto envia. `filhos` recebe `pendente` para quem
+ * precisar trocar o texto do botão.
+ */
+export function Formulario({
+  acao,
+  children,
+  textoBotao,
+  textoEnviando = "Enviando…",
+  mensagemOk,
+  className = "space-y-4",
+}: {
+  acao: (estado: EstadoDoForm, form: FormData) => Promise<EstadoDoForm>;
+  children: ReactNode;
+  textoBotao: string;
+  textoEnviando?: string;
+  mensagemOk?: string;
+  className?: string;
+}) {
+  const [estado, enviar, pendente] = useActionState(acao, estadoInicial);
+  return (
+    <form action={enviar} className={className}>
+      {children}
+      {estado.erro && (
+        <p className="erro" role="alert">
+          {estado.erro}
+        </p>
+      )}
+      {estado.ok && mensagemOk && <p className="text-sm text-marca">{mensagemOk}</p>}
+      <button type="submit" className="btn-primario w-full" disabled={pendente}>
+        {pendente ? textoEnviando : textoBotao}
+      </button>
+    </form>
+  );
+}

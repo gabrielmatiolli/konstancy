@@ -1,0 +1,114 @@
+# Saúde Check
+
+PWA para a família registrar check-ins diários de atividade física, no estilo BeReal:
+foto + descrição, curtidas, comentários, push quando alguém treina e desafios com data
+de fim e prêmio.
+
+Stack: Next.js 16 (App Router, Server Actions) · Prisma 7 + MySQL/MariaDB · Web Push
+(VAPID, `web-push`) · `sharp` para as fotos · Tailwind 4. Deploy como app Node.js na
+Hostinger, igual ao RR Film e à Multipatas.
+
+## Funcionalidades
+
+| Tela | Rota | O que faz |
+| --- | --- | --- |
+| Início | `/` | Quem já treinou hoje (anéis nos avatares), CTA do check-in e o feed da última semana |
+| Check-in | `/checkin/novo` | Câmera do celular, atividade, duração e descrição. A foto é comprimida no aparelho |
+| Check-in | `/checkin/[id]` | Foto grande, curtidas e comentários |
+| Painel | `/painel` | Grade pessoa × dia (7/14/30 dias) com as miniaturas; linha de "treinaram x/y" |
+| Desafios | `/desafios`, `/desafios/novo`, `/desafios/[id]` | Período, prêmio, placar, sequência 🔥 e vencedor |
+| Perfil | `/perfil` | Estatísticas, ligar/desligar notificações neste aparelho |
+| Família | `/familia` | Convite (código + link para WhatsApp), membros, admins, modo BeReal |
+| Onboarding | `/cadastro`, `/entrar`, `/comecar`, `/convite/[codigo]` | Conta, criar família ou entrar por convite |
+
+**Modo BeReal** (ligado por padrão, configurável pela família): as fotos de hoje dos
+outros ficam borradas até você postar a sua. O borrão é aplicado no servidor
+(`/api/fotos/[id]`), não só no CSS.
+
+**Regra dos desafios:** vence quem fizer check-in em mais dias distintos entre o início
+e o fim. Vários check-ins no mesmo dia contam uma vez; empate divide o prêmio. O placar é
+calculado na hora a partir dos check-ins (`src/lib/desafios.ts`).
+
+**Push enviado quando:** alguém da família faz check-in · curtem seu check-in ·
+comentam no seu check-in (ou numa conversa em que você comentou) · sai um desafio novo ·
+um desafio termina (cron) · lembrete de fim de tarde para quem não treinou (cron).
+
+## Estrutura
+
+```
+prisma/
+  schema.prisma         Usuario, Familia, Membro, Checkin, Comentario, Curtida,
+                        Desafio, Participante, InscricaoPush
+  migrations/           SQL versionado — aplicar com npm run db:deploy
+  seed.ts               família de teste (só banco local)
+public/
+  sw.js                 service worker: recebe o push e abre a tela certa
+  icones/               ícones provisórios (scripts/gerar-icones.mjs)
+src/
+  acoes/                Server Actions: auth, familia, checkins (+curtidas/comentários),
+                        desafios, push
+  app/
+    (publico)/          entrar, cadastro
+    (app)/              telas logadas, com navegação inferior
+    comecar/            onboarding sem família
+    convite/[codigo]/   link de convite
+    api/fotos/[id]/     serve as fotos só para membros (e borra quando precisa)
+    api/cron/           lembrete diário e encerramento de desafios
+    manifest.ts         manifesto do PWA
+  componentes/          UI (provisória — o design vem depois)
+  lib/
+    auth.ts             sessão em cookie JWT (jose) + bcrypt
+    familia.ts          família ativa, convites
+    datas.ts            "dia civil" em America/Sao_Paulo
+    fotos.ts            sharp → WebP + miniatura, gravado em STORAGE_DIR
+    push.ts             envio Web Push e limpeza de inscrições mortas
+    desafios.ts         placar
+    consultas.ts        consultas do feed e regra do borrão
+```
+
+Design: todo o visual passa pelos tokens em `src/app/globals.css` (`--marca`, `--fundo`...)
+e pelas utilidades `btn`, `btn-primario`, `campo`, `cartao`. Os ícones da navegação são
+texto provisório.
+
+## Rodar local
+
+1. Suba o MySQL local (serviço `MySQL80`, precisa de terminal como administrador).
+2. Preencha a senha na `DATABASE_URL` do `.env.local` (caracteres especiais codificados).
+3. Crie o banco e aplique as migrations, depois o seed:
+
+```bash
+npx prisma migrate dev
+```
+
+```bash
+npm run db:seed
+```
+
+4. `npm run dev` e abra http://localhost:3000 — contas de teste no `prisma/seed.ts`.
+
+Push e câmera precisam de HTTPS fora do `localhost`. Para testar no celular pela rede,
+use `npx next dev --experimental-https`. No iPhone, o push só funciona com o app
+instalado na tela de início (iOS 16.4+); a tela de Perfil explica isso ao usuário.
+
+## Deploy na Hostinger
+
+1. Crie o `.env` de produção a partir do `.env.example`:
+   - `SESSAO_SEGREDO` e `CRON_SEGREDO` novos (não reaproveitar os de dev);
+   - as chaves VAPID podem ser as mesmas do dev ou novas (`npm run vapid`). **Trocar as
+     chaves depois invalida todas as inscrições de push** — cada um precisa reativar;
+   - `STORAGE_DIR` apontando para uma pasta **fora** da pasta do app (ex.:
+     `/home/<usuario>/saude-check-fotos`), senão as fotos somem no próximo deploy.
+2. Aplique as migrations no banco da Hostinger: `npm run db:deploy`.
+3. `python scripts/empacotar.py` gera `saude-check.zip`; suba como app Node.js.
+4. Cron jobs no hPanel (horário do servidor é UTC):
+   - lembrete às 19h de Brasília → `0 22 * * *`
+     `curl -s -H "Authorization: Bearer $CRON_SEGREDO" "https://<dominio>/api/cron?tarefa=lembrete"`
+   - encerrar desafios às 0h10 de Brasília → `10 3 * * *`
+     `curl -s -H "Authorization: Bearer $CRON_SEGREDO" "https://<dominio>/api/cron?tarefa=encerrar"`
+
+## Próximos passos
+
+- Design (Figma) e ícones definitivos.
+- Foto de perfil, reações com emoji, "dupla câmera" (frente + traseira) como no BeReal.
+- Trocar o `STORAGE_DIR` por S3/R2 se o volume de fotos crescer (`src/lib/fotos.ts`).
+- Recuperação de senha por e-mail.

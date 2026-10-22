@@ -1,0 +1,186 @@
+// Prisma schema do Saúde Check — check-ins diários de atividade física em família.
+// Docs: https://pris.ly/d/prisma-schema
+//
+// Regras do MySQL 8 / MariaDB (ver README): nada de @default em TEXT/JSON;
+// campo curto com default vira VARCHAR(n).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ---------------------------------------------------------------------------
+// Pessoas e famílias
+// ---------------------------------------------------------------------------
+
+model Usuario {
+  id           String   @id @default(cuid())
+  nome         String   @db.VarChar(80)
+  email        String   @unique @db.VarChar(191)
+  senhaHash    String   @db.VarChar(100)
+  /// Incrementado em troca de senha / "sair de todos os aparelhos": invalida os cookies antigos.
+  versaoSessao Int      @default(0)
+  /// Família exibida no app quando a pessoa participa de mais de uma.
+  familiaAtivaId String?
+  criadoEm     DateTime @default(now())
+
+  familiaAtiva    Familia?        @relation("familiaAtiva", fields: [familiaAtivaId], references: [id], onDelete: SetNull)
+  membros         Membro[]
+  checkins        Checkin[]
+  comentarios     Comentario[]
+  curtidas        Curtida[]
+  inscricoesPush  InscricaoPush[]
+  participacoes   Participante[]
+  desafiosCriados Desafio[]       @relation("criadorDoDesafio")
+
+  @@index([familiaAtivaId])
+}
+
+enum PapelNaFamilia {
+  /// Edita a família, regenera o convite e remove membros.
+  ADMIN
+  MEMBRO
+}
+
+model Familia {
+  id            String   @id @default(cuid())
+  nome          String   @db.VarChar(80)
+  /// Código curto usado no link de convite (/convite/CODIGO).
+  codigoConvite String   @unique @db.VarChar(12)
+  /// Estilo BeReal: as fotos do dia ficam borradas até a pessoa postar a dela.
+  borrarAtePostar Boolean @default(true)
+  criadoEm      DateTime @default(now())
+
+  membros        Membro[]
+  checkins       Checkin[]
+  desafios       Desafio[]
+  usuariosAtivos Usuario[] @relation("familiaAtiva")
+}
+
+model Membro {
+  usuarioId String
+  familiaId String
+  papel     PapelNaFamilia @default(MEMBRO)
+  entrouEm  DateTime       @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  familia Familia @relation(fields: [familiaId], references: [id], onDelete: Cascade)
+
+  @@id([usuarioId, familiaId])
+  @@index([familiaId])
+}
+
+// ---------------------------------------------------------------------------
+// Check-ins e interação
+// ---------------------------------------------------------------------------
+
+model Checkin {
+  id         String   @id @default(cuid())
+  usuarioId  String
+  familiaId  String
+  /// Dia civil do check-in no fuso da família (America/Sao_Paulo), não o instante UTC.
+  dia        DateTime @db.Date
+  /// Caminhos relativos ao STORAGE_DIR — servidos por /api/fotos/[id], nunca pelo /public.
+  fotoPath   String   @db.VarChar(255)
+  thumbPath  String   @db.VarChar(255)
+  largura    Int
+  altura     Int
+  descricao  String?  @db.Text
+  /// Rótulo livre escolhido numa lista curta (Corrida, Academia, Caminhada...).
+  atividade  String?  @db.VarChar(40)
+  duracaoMin Int?
+  criadoEm   DateTime @default(now())
+
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  familia     Familia      @relation(fields: [familiaId], references: [id], onDelete: Cascade)
+  comentarios Comentario[]
+  curtidas    Curtida[]
+
+  @@index([familiaId, dia])
+  @@index([usuarioId, dia])
+}
+
+model Comentario {
+  id        String   @id @default(cuid())
+  checkinId String
+  usuarioId String
+  texto     String   @db.Text
+  criadoEm  DateTime @default(now())
+
+  checkin Checkin @relation(fields: [checkinId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([checkinId, criadoEm])
+}
+
+model Curtida {
+  checkinId String
+  usuarioId String
+  criadoEm  DateTime @default(now())
+
+  checkin Checkin @relation(fields: [checkinId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([checkinId, usuarioId])
+  @@index([usuarioId])
+}
+
+// ---------------------------------------------------------------------------
+// Desafios
+// ---------------------------------------------------------------------------
+
+model Desafio {
+  id          String    @id @default(cuid())
+  familiaId   String
+  criadorId   String
+  titulo      String    @db.VarChar(100)
+  descricao   String?   @db.Text
+  premio      String    @db.VarChar(200)
+  dataInicio  DateTime  @db.Date
+  dataFim     DateTime  @db.Date
+  /// Preenchido pelo cron no dia seguinte ao fim, junto com o push do resultado.
+  encerradoEm DateTime?
+  criadoEm    DateTime  @default(now())
+
+  familia       Familia        @relation(fields: [familiaId], references: [id], onDelete: Cascade)
+  criador       Usuario        @relation("criadorDoDesafio", fields: [criadorId], references: [id], onDelete: Cascade)
+  participantes Participante[]
+
+  @@index([familiaId, dataFim])
+  @@index([criadorId])
+}
+
+model Participante {
+  desafioId String
+  usuarioId String
+  entrouEm  DateTime @default(now())
+
+  desafio Desafio @relation(fields: [desafioId], references: [id], onDelete: Cascade)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([desafioId, usuarioId])
+  @@index([usuarioId])
+}
+
+// ---------------------------------------------------------------------------
+// Web Push
+// ---------------------------------------------------------------------------
+
+/// Uma por aparelho/navegador. Removida quando o serviço de push responde 404/410.
+model InscricaoPush {
+  id        String   @id @default(cuid())
+  usuarioId String
+  endpoint  String   @unique @db.VarChar(500)
+  p256dh    String   @db.VarChar(200)
+  auth      String   @db.VarChar(100)
+  userAgent String?  @db.VarChar(255)
+  criadoEm  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}

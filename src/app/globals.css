@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+/*
+ * Estrutura funcional — o design definitivo vem depois. Tudo que é visual
+ * passa por estes tokens e pelas classes de componente abaixo, para que o
+ * redesign troque um lugar só.
+ */
+
+:root {
+  --fundo: #fafaf9;
+  --superficie: #ffffff;
+  --texto: #1c1917;
+  --texto-suave: #78716c;
+  --borda: #e7e5e4;
+  --marca: #16a34a;
+  --marca-texto: #ffffff;
+  --perigo: #dc2626;
+  --altura-nav: 4rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0c0a09;
+    --superficie: #1c1917;
+    --texto: #fafaf9;
+    --texto-suave: #a8a29e;
+    --borda: #292524;
+  }
+}
+
+@theme inline {
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-texto: var(--texto);
+  --color-suave: var(--texto-suave);
+  --color-borda: var(--borda);
+  --color-marca: var(--marca);
+  --color-marca-texto: var(--marca-texto);
+  --color-perigo: var(--perigo);
+  --font-sans: var(--font-geist-sans);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    overscroll-behavior-y: none;
+  }
+}
+
+/* Componentes como @utility para poderem ser compostos com @apply. */
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-borda bg-superficie px-4 text-sm font-medium transition active:scale-[0.98] disabled:opacity-50;
+}
+@utility btn-primario {
+  @apply btn border-marca bg-marca text-marca-texto;
+}
+@utility btn-perigo {
+  @apply btn border-perigo text-perigo;
+}
+@utility campo {
+  @apply min-h-11 w-full rounded-xl border border-borda bg-superficie px-3 py-2 text-base outline-none focus:border-marca;
+}
+@utility rotulo {
+  @apply mb-1 block text-sm font-medium;
+}
+@utility cartao {
+  @apply rounded-2xl border border-borda bg-superficie;
+}
+@utility titulo-pagina {
+  @apply text-2xl font-bold tracking-tight;
+}
+@utility erro {
+  @apply rounded-lg bg-perigo/10 px-3 py-2 text-sm text-perigo;
+}
