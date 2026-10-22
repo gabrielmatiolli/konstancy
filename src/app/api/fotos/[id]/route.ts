@@ -2,11 +2,12 @@ import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
 import { usuarioLogado } from "@/lib/auth";
 import { ehMembro } from "@/lib/familia";
-import { lerFoto } from "@/lib/fotos";
+import { lerFoto, lerMedia } from "@/lib/fotos";
 import { deveBorrar, jaFezCheckinHoje } from "@/lib/consultas";
 
 /**
- * Fotos de check-in só para membros da família. `?v=thumb` serve a miniatura.
+ * Fotos de check-in só para membros da família. `?v=media` (feed, 720px) e
+ * `?v=thumb` (painel, 240px) servem as versões menores.
  * Foto de hoje de outra pessoa sai borrada no servidor enquanto quem pede não
  * postou a sua (quando a família usa o modo BeReal).
  */
@@ -46,11 +47,13 @@ export async function GET(request: Request, { params }: RouteContext<"/api/fotos
   let arquivo: Buffer;
   try {
     // Borrada sai sempre da miniatura: não adianta pedir a grande.
-    arquivo = await lerFoto(thumb || borrar ? checkin.thumbPath : checkin.fotoPath);
+    if (thumb || borrar) arquivo = await lerFoto(checkin.thumbPath);
+    else if (versao === "media") arquivo = await lerMedia(checkin.fotoPath);
+    else arquivo = await lerFoto(checkin.fotoPath);
   } catch {
     return new Response("Arquivo não encontrado", { status: 404 });
   }
-  if (borrar) arquivo = await sharp(arquivo).blur(25).webp({ quality: 40 }).toBuffer();
+  if (borrar) arquivo = await sharp(arquivo).blur(18).webp({ quality: 40 }).toBuffer();
 
   return new Response(new Uint8Array(arquivo), {
     headers: {

@@ -34,9 +34,9 @@ export default async function PaginaEntrar({ searchParams }: PageProps<"/entrar"
           />
         </div>
       </Formulario>
-      <p className="mt-6 text-center text-sm text-suave">
+      <p className="mt-6 text-center text-[15px] text-suave">
         Primeira vez?{" "}
-        <Link href="/cadastro" className="font-medium text-marca">
+        <Link href="/cadastro" className="font-bold text-marca-forte">
           Criar conta
         </Link>
       </p>

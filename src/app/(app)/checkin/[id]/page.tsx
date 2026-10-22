@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Trash } from "lucide-react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { exigirFamilia } from "@/lib/familia";
@@ -9,6 +9,7 @@ import { Avatar } from "@/componentes/Avatar";
 import { CartaoCheckin } from "@/componentes/CartaoCheckin";
 import { FormComentario } from "@/componentes/FormComentario";
 import { BotaoConfirmar } from "@/componentes/BotaoConfirmar";
+import { Topo } from "@/componentes/Topo";
 
 export const metadata = { title: "Check-in" };
 
@@ -37,59 +38,71 @@ export default async function PaginaCheckin({ params }: PageProps<"/checkin/[id]
     checkin.familia.borrarAtePostar,
   );
 
+  const meu = checkin.usuarioId === usuario.id;
+
   return (
-    <div className="space-y-6">
-      <Link href="/" className="text-sm text-suave">
-        ← Voltar
-      </Link>
+    <div className="space-y-5">
+      <Topo
+        voltar="/"
+        titulo={meu ? "Seu check-in" : checkin.usuario.nome.split(" ")[0]}
+        acao={
+          meu && (
+            <BotaoConfirmar
+              acao={apagarCheckin.bind(null, checkin.id)}
+              pergunta="Apagar este check-in?"
+              detalhe="A foto some do feed e o dia deixa de contar nos desafios."
+              textoConfirmar="Apagar"
+              className="btn-icone text-suave"
+            >
+              <Trash className="size-5" aria-label="Apagar check-in" />
+            </BotaoConfirmar>
+          )
+        }
+      />
 
       <CartaoCheckin checkin={checkin} borrado={borrado} completo />
 
-      <section id="comentarios" className="space-y-4">
-        <h2 className="font-semibold">Comentários</h2>
+      <section id="comentarios" className="scroll-mt-4 space-y-4">
+        <h2 className="subtitulo">
+          Comentários{checkin.comentarios.length > 0 && ` · ${checkin.comentarios.length}`}
+        </h2>
         {borrado ? (
           <p className="text-sm text-suave">Os comentários aparecem depois do seu check-in de hoje.</p>
         ) : (
           <>
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {checkin.comentarios.map((c) => (
-                <li key={c.id} className="flex gap-3">
-                  <Avatar usuario={c.usuario} tamanho={28} />
+                <li key={c.id} className="surgir flex gap-3">
+                  <Avatar usuario={c.usuario} tamanho={34} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm">
-                      <span className="font-semibold">{c.usuario.nome}</span> {c.texto}
-                    </p>
-                    <p className="flex gap-3 text-xs text-suave">
+                    <div className="rounded-2xl rounded-tl-md bg-superficie px-4 py-2.5">
+                      <p className="text-sm font-bold">{c.usuario.id === usuario.id ? "Você" : c.usuario.nome}</p>
+                      <p className="text-[15px] break-words whitespace-pre-line">{c.texto}</p>
+                    </div>
+                    <p className="mt-1 flex items-center gap-3 pl-2 text-xs text-suave">
                       {tempoRelativo(c.criadoEm)}
                       {c.usuario.id === usuario.id && (
                         <BotaoConfirmar
                           acao={apagarComentario.bind(null, c.id)}
                           pergunta="Apagar este comentário?"
-                          className="text-xs text-suave underline"
+                          textoConfirmar="Apagar"
+                          className="min-h-8 font-semibold"
                         >
-                          apagar
+                          Apagar
                         </BotaoConfirmar>
                       )}
                     </p>
                   </div>
                 </li>
               ))}
-              {checkin.comentarios.length === 0 && <li className="text-sm text-suave">Seja o primeiro a comentar.</li>}
+              {checkin.comentarios.length === 0 && (
+                <li className="text-sm text-suave">Ninguém comentou ainda. Mande um incentivo!</li>
+              )}
             </ul>
             <FormComentario checkinId={checkin.id} />
           </>
         )}
       </section>
-
-      {checkin.usuarioId === usuario.id && (
-        <BotaoConfirmar
-          acao={apagarCheckin.bind(null, checkin.id)}
-          pergunta="Apagar este check-in? Ele deixa de contar nos desafios."
-          className="btn-perigo w-full"
-        >
-          Apagar check-in
-        </BotaoConfirmar>
-      )}
     </div>
   );
 }

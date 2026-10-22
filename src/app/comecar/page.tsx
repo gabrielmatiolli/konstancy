@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
+import { Ticket, UsersRound } from "lucide-react";
 import { exigirUsuario } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { criarFamilia, entrarNaFamilia } from "@/acoes/familia";
 import { sair } from "@/acoes/auth";
 import { Formulario } from "@/componentes/Formulario";
+import { Marca } from "@/componentes/Marca";
 
 export const metadata = { title: "Começar" };
 
@@ -13,35 +15,57 @@ export default async function PaginaComecar() {
   if (await prisma.membro.count({ where: { usuarioId: usuario.id } })) redirect("/");
 
   return (
-    <main className="mx-auto w-full max-w-sm space-y-8 px-4 py-10">
-      <div>
-        <h1 className="titulo-pagina">Oi, {usuario.nome.split(" ")[0]}!</h1>
-        <p className="mt-1 text-suave">Entre na família com o código de convite ou crie uma nova.</p>
+    <main className="mx-auto w-full max-w-sm space-y-5 px-5 py-10">
+      <div className="mb-2 flex flex-col items-center text-center">
+        <Marca tamanho={56} />
+        <h1 className="mt-4 text-[26px] font-extrabold">Oi, {usuario.nome.split(" ")[0]}!</h1>
+        <p className="text-suave">Para começar, entre na família de vocês.</p>
       </div>
 
-      <section className="cartao p-4">
-        <h2 className="mb-3 font-semibold">Tenho um convite</h2>
+      <section className="cartao p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="grid size-11 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+            <Ticket className="size-5" />
+          </span>
+          <div>
+            <h2 className="font-bold">Recebi um convite</h2>
+            <p className="text-sm text-suave">Digite o código que te mandaram.</p>
+          </div>
+        </div>
         <Formulario acao={entrarNaFamilia} textoBotao="Entrar na família">
           <input
             name="codigo"
-            placeholder="Código (ex.: K7M2QX)"
+            placeholder="K7M2QX"
+            aria-label="Código de convite"
             autoCapitalize="characters"
             autoComplete="off"
             required
-            className="campo uppercase tracking-widest"
+            className="campo text-center text-xl font-bold tracking-[0.3em] uppercase"
           />
         </Formulario>
       </section>
 
-      <section className="cartao p-4">
-        <h2 className="mb-3 font-semibold">Criar uma família</h2>
+      <div className="flex items-center gap-3 text-sm text-suave">
+        <span className="h-px flex-1 bg-borda" /> ou <span className="h-px flex-1 bg-borda" />
+      </div>
+
+      <section className="cartao p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="grid size-11 place-items-center rounded-2xl bg-superficie-2 text-suave">
+            <UsersRound className="size-5" />
+          </span>
+          <div>
+            <h2 className="font-bold">Sou o primeiro</h2>
+            <p className="text-sm text-suave">Crie a família e convide o pessoal.</p>
+          </div>
+        </div>
         <Formulario acao={criarFamilia} textoBotao="Criar família">
-          <input name="nome" placeholder="Nome da família" required maxLength={80} className="campo" />
+          <input name="nome" placeholder="Ex.: Família Silva" aria-label="Nome da família" required maxLength={80} className="campo" />
         </Formulario>
       </section>
 
-      <form action={sair}>
-        <button className="w-full text-sm text-suave">Sair da conta</button>
+      <form action={sair} className="text-center">
+        <button className="min-h-11 px-4 text-sm font-semibold text-suave">Sair da conta</button>
       </form>
     </main>
   );

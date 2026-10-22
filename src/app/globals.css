@@ -1,79 +1,173 @@
 @import "tailwindcss";
 
 /*
- * Estrutura funcional — o design definitivo vem depois. Tudo que é visual
- * passa por estes tokens e pelas classes de componente abaixo, para que o
- * redesign troque um lugar só.
+ * Sistema visual do Saúde Check.
+ *
+ * Igual em Android, iPhone e desktop: fonte própria (Figtree), ícones SVG
+ * (lucide) em vez de emoji — emoji muda de desenho entre Samsung, Motorola e
+ * Apple — e controles desenhados aqui em vez dos nativos.
+ *
+ * Leve para Android de entrada: nada de backdrop-filter nem sombras grandes
+ * (custam GPU em rolagem), cards fora da tela pulam a renderização
+ * (content-visibility) e animações só em transform/opacity.
  */
 
 :root {
-  --fundo: #fafaf9;
+  --fundo: #f5f6f4;
   --superficie: #ffffff;
-  --texto: #1c1917;
-  --texto-suave: #78716c;
-  --borda: #e7e5e4;
-  --marca: #16a34a;
+  --superficie-2: #eef0ec;
+  --texto: #14181a;
+  --texto-suave: #61686e;
+  --borda: #e2e5e0;
+  /* Verde de marca: o claro para destaques, o forte para botões e texto (contraste AA). */
+  --marca: #22a45a;
+  --marca-forte: #157a3f;
+  --marca-suave: #e3f4e9;
   --marca-texto: #ffffff;
-  --perigo: #dc2626;
+  --fogo: #f2711c;
+  --curtida: #e5364d;
+  --perigo: #c8302f;
+  --ouro: #e4a11b;
+  --prata: #9aa4ad;
+  --bronze: #c07a43;
   --altura-nav: 4rem;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fundo: #0c0a09;
-    --superficie: #1c1917;
-    --texto: #fafaf9;
-    --texto-suave: #a8a29e;
-    --borda: #292524;
+    --fundo: #0e1110;
+    --superficie: #171b19;
+    --superficie-2: #212623;
+    --texto: #eef1ef;
+    --texto-suave: #9aa39f;
+    --borda: #262c29;
+    --marca: #34c472;
+    --marca-forte: #34c472;
+    --marca-suave: #173323;
+    --marca-texto: #05210f;
+    --perigo: #f0605f;
+    color-scheme: dark;
   }
 }
 
 @theme inline {
   --color-fundo: var(--fundo);
   --color-superficie: var(--superficie);
+  --color-superficie-2: var(--superficie-2);
   --color-texto: var(--texto);
   --color-suave: var(--texto-suave);
   --color-borda: var(--borda);
   --color-marca: var(--marca);
+  --color-marca-forte: var(--marca-forte);
+  --color-marca-suave: var(--marca-suave);
   --color-marca-texto: var(--marca-texto);
+  --color-fogo: var(--fogo);
+  --color-curtida: var(--curtida);
   --color-perigo: var(--perigo);
-  --font-sans: var(--font-geist-sans);
+  --color-ouro: var(--ouro);
+  --color-prata: var(--prata);
+  --color-bronze: var(--bronze);
+  --font-sans: var(--font-figtree);
 }
 
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     background: var(--fundo);
     color: var(--texto);
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-figtree), system-ui, sans-serif;
     overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  button,
+  a,
+  label,
+  summary {
+    /* Sem o atraso de toque duplo e sem selecionar texto ao segurar o botão. */
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  :focus-visible {
+    outline: 2px solid var(--marca);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 /* Componentes como @utility para poderem ser compostos com @apply. */
 @utility btn {
-  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-borda bg-superficie px-4 text-sm font-medium transition active:scale-[0.98] disabled:opacity-50;
+  @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-borda bg-superficie px-5 text-[15px] font-semibold transition-[transform,background-color] duration-150 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
 }
 @utility btn-primario {
-  @apply btn border-marca bg-marca text-marca-texto;
+  @apply btn border-transparent bg-marca-forte text-white dark:text-marca-texto;
+}
+@utility btn-suave {
+  @apply btn border-transparent bg-superficie-2;
 }
 @utility btn-perigo {
-  @apply btn border-perigo text-perigo;
+  @apply btn border-transparent bg-perigo/10 text-perigo;
+}
+@utility btn-icone {
+  @apply inline-grid size-11 shrink-0 place-items-center rounded-full transition-[transform,background-color] duration-150 active:scale-90 active:bg-superficie-2;
 }
 @utility campo {
-  @apply min-h-11 w-full rounded-xl border border-borda bg-superficie px-3 py-2 text-base outline-none focus:border-marca;
+  @apply min-h-12 w-full rounded-2xl border border-borda bg-superficie px-4 py-3 text-base outline-none transition-colors placeholder:text-suave focus:border-marca;
 }
 @utility rotulo {
-  @apply mb-1 block text-sm font-medium;
+  @apply mb-1.5 block text-sm font-semibold;
 }
 @utility cartao {
-  @apply rounded-2xl border border-borda bg-superficie;
+  @apply rounded-3xl border border-borda bg-superficie;
 }
 @utility titulo-pagina {
-  @apply text-2xl font-bold tracking-tight;
+  @apply text-[26px] leading-tight font-extrabold tracking-tight;
+}
+@utility subtitulo {
+  @apply text-[13px] font-bold tracking-wide text-suave uppercase;
 }
 @utility erro {
-  @apply rounded-lg bg-perigo/10 px-3 py-2 text-sm text-perigo;
+  @apply rounded-2xl bg-perigo/10 px-4 py-3 text-sm font-medium text-perigo;
+}
+@utility chip {
+  @apply inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border border-borda bg-superficie px-4 text-sm font-semibold transition-colors has-checked:border-marca-forte has-checked:bg-marca-suave has-checked:text-marca-forte;
+}
+/* Card fora da tela não é desenhado — alivia a rolagem do feed em aparelho fraco. */
+@utility leve {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
+}
+
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@utility surgir {
+  animation: surgir 0.22s ease-out both;
+}
+
+@keyframes brilho {
+  to {
+    background-position: -200% 0;
+  }
+}
+/* Esqueleto de carregamento. */
+@utility esqueleto {
+  background: linear-gradient(90deg, var(--superficie-2) 25%, var(--borda) 50%, var(--superficie-2) 75%);
+  background-size: 200% 100%;
+  animation: brilho 1.4s linear infinite;
 }

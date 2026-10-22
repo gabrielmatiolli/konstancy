@@ -66,9 +66,28 @@ src/
     consultas.ts        consultas do feed e regra do borrão
 ```
 
-Design: todo o visual passa pelos tokens em `src/app/globals.css` (`--marca`, `--fundo`...)
-e pelas utilidades `btn`, `btn-primario`, `campo`, `cartao`. Os ícones da navegação são
-texto provisório.
+## Design e desempenho
+
+Pensado primeiro para Android de entrada (tela de 360px, 2 GB de RAM, 4G fraco), com a
+mesma cara em Android, iPhone e desktop:
+
+- **Mesmo visual em todo sistema:** fonte Figtree servida pelo próprio app, ícones SVG
+  (`lucide-react`) em vez de emoji, e controles próprios (interruptor, chips, folha de
+  confirmação) em vez dos nativos. Tokens de cor em `src/app/globals.css`, com modo escuro.
+- **Fotos em três tamanhos:** 1440px só na tela do check-in, 720px no feed (~76 KB numa
+  foto real, contra ~365 KB da grande) e 240px no painel (~12 KB). Check-ins antigos ganham
+  a versão média na primeira visita.
+- **Compressão no aparelho com pouca memória:** a foto da câmera é decodificada já reduzida
+  (`createImageBitmap` com `resizeWidth`) e sobe com ~1600px, respeitando a rotação do EXIF.
+- **Rolagem leve:** sem `backdrop-filter` nem sombras grandes; cards fora da tela não são
+  desenhados (`content-visibility`) e as fotos só baixam quando chegam perto da tela.
+- **Resposta imediata:** esqueleto de carregamento a cada toque (`loading.tsx`), curtida
+  otimista e botões com estado de envio.
+- **Instalação:** no Android, botão "Instalar app" (evento `beforeinstallprompt`); no
+  iPhone, passo a passo. Ver `src/componentes/InstalarApp.tsx`.
+
+Peso do feed em produção: ~149 KB de JS, ~20 KB de fonte e ~8 KB de CSS (comprimidos),
+mais as fotos visíveis.
 
 ## Rodar local
 

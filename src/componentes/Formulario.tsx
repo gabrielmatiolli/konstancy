@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, type ReactNode } from "react";
+import { Check, Loader2 } from "lucide-react";
 import { estadoInicial, type EstadoDoForm } from "@/acoes/estado";
 
 /**
@@ -32,9 +33,19 @@ export function Formulario({
           {estado.erro}
         </p>
       )}
-      {estado.ok && mensagemOk && <p className="text-sm text-marca">{mensagemOk}</p>}
+      {estado.ok && mensagemOk && !pendente && (
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-marca-forte" role="status">
+          <Check className="size-4" /> {mensagemOk}
+        </p>
+      )}
       <button type="submit" className="btn-primario w-full" disabled={pendente}>
-        {pendente ? textoEnviando : textoBotao}
+        {pendente ? (
+          <>
+            <Loader2 className="size-5 animate-spin" /> {textoEnviando}
+          </>
+        ) : (
+          textoBotao
+        )}
       </button>
     </form>
   );

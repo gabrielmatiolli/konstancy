@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Check, Share2 } from "lucide-react";
 
 /**
  * Copia texto mesmo sem a Clipboard API — ela (e o navigator.share) só existe
@@ -64,13 +65,23 @@ export function CompartilharConvite({ codigo, familia }: { codigo: string; famil
   }
 
   return (
-    <div className="space-y-2">
-      <p className="text-center text-3xl font-bold tracking-[0.3em]">{codigo}</p>
+    <div className="space-y-3">
+      <p className="rounded-2xl bg-superficie-2 py-3 text-center text-3xl font-extrabold tracking-[0.3em] tabular-nums select-all">
+        {codigo}
+      </p>
       <button type="button" className="btn-primario w-full" onClick={compartilhar}>
-        {estado === "copiado" ? "Link copiado!" : "Convidar pelo WhatsApp / link"}
+        {estado === "copiado" ? (
+          <>
+            <Check className="size-5" /> Link copiado!
+          </>
+        ) : (
+          <>
+            <Share2 className="size-5" /> Enviar convite
+          </>
+        )}
       </button>
       {estado === "manual" && (
-        <div className="space-y-1">
+        <div className="space-y-1 text-left">
           <p className="text-xs text-suave">Não deu para copiar automaticamente. Segure o link abaixo e copie:</p>
           <input
             ref={campo}

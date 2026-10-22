@@ -12,8 +12,15 @@ import sharp, { type Sharp } from "sharp";
  */
 
 export const TAMANHO_MAXIMO = 15 * 1024 * 1024;
+/*
+ * Três tamanhos, pensando em Android de entrada no 4G:
+ *   grande  1440px — só na tela do check-in, para dar zoom
+ *   média    720px — o feed (360px de tela × densidade 2), ~5× mais leve que a grande
+ *   miniatura 240px quadrada — células do painel e base da versão borrada
+ */
 const LADO_FOTO = 1440;
-const LADO_THUMB = 400;
+const LADO_MEDIA = 720;
+const LADO_THUMB = 240;
 
 function raiz() {
   return path.resolve(process.env.STORAGE_DIR || "./uploads");
@@ -57,6 +64,7 @@ export async function salvarFoto(arquivo: File, id: string, dia: string): Promis
   const pasta = path.posix.join("checkins", ano, mes);
   const fotoPath = path.posix.join(pasta, `${id}.webp`);
   const thumbPath = path.posix.join(pasta, `${id}_t.webp`);
+  const mediaPath = caminhoDaMedia(fotoPath);
 
   await mkdir(caminhoAbsoluto(pasta), { recursive: true });
 
@@ -65,20 +73,49 @@ export async function salvarFoto(arquivo: File, id: string, dia: string): Promis
     .resize(LADO_FOTO, LADO_FOTO, { fit: "inside", withoutEnlargement: true })
     .webp({ quality: 80 })
     .toBuffer({ resolveWithObject: true });
+  const media = await gerarMedia(foto);
   const thumb = await base
     .clone()
     .resize(LADO_THUMB, LADO_THUMB, { fit: "cover" })
-    .webp({ quality: 70 })
+    .webp({ quality: 65 })
     .toBuffer();
 
   await writeFile(caminhoAbsoluto(fotoPath), foto);
+  await writeFile(caminhoAbsoluto(mediaPath), media);
   await writeFile(caminhoAbsoluto(thumbPath), thumb);
 
   return { fotoPath, thumbPath, largura: info.width, altura: info.height };
 }
 
+/** A versão média não tem coluna própria: mora ao lado da grande, com sufixo _m. */
+export function caminhoDaMedia(fotoPath: string) {
+  return fotoPath.replace(/\.webp$/, "_m.webp");
+}
+
+function gerarMedia(foto: Buffer) {
+  return sharp(foto)
+    .resize(LADO_MEDIA, LADO_MEDIA, { fit: "inside", withoutEnlargement: true })
+    .webp({ quality: 74 })
+    .toBuffer();
+}
+
 export async function lerFoto(relativo: string) {
   return readFile(caminhoAbsoluto(relativo));
+}
+
+/**
+ * Lê a versão média; check-ins anteriores a ela ganham a sua na primeira
+ * leitura, gerada a partir da grande.
+ */
+export async function lerMedia(fotoPath: string) {
+  const mediaPath = caminhoDaMedia(fotoPath);
+  try {
+    return await readFile(caminhoAbsoluto(mediaPath));
+  } catch {
+    const media = await gerarMedia(await lerFoto(fotoPath));
+    await writeFile(caminhoAbsoluto(mediaPath), media).catch(() => {});
+    return media;
+  }
 }
 
 export async function apagarFotos(...relativos: string[]) {

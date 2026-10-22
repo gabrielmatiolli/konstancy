@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Bell, BellOff, Loader2 } from "lucide-react";
 import { enviarPushDeTeste, removerInscricao, salvarInscricao } from "@/acoes/push";
 
 type Estado = "carregando" | "sem-https" | "sem-suporte" | "instalar-ios" | "bloqueado" | "desligado" | "ligado";
@@ -88,29 +89,44 @@ export function AtivarNotificacoes() {
     "sem-suporte": "Este navegador não suporta notificações.",
     "instalar-ios":
       "No iPhone, as notificações só funcionam com o app instalado: toque em Compartilhar → “Adicionar à Tela de Início” e abra o Saúde Check por lá.",
-    bloqueado: "As notificações estão bloqueadas. Libere nas configurações do navegador para este site.",
-    desligado: "Receba um aviso quando alguém da família fizer check-in.",
-    ligado: "Notificações ligadas neste aparelho.",
+    bloqueado:
+      "Os avisos estão bloqueados para este app. No Android: toque no cadeado ao lado do endereço (ou segure o ícone do app → Informações) → Notificações → Permitir.",
+    desligado: "Saiba na hora quando alguém da família treinar, curtir ou comentar.",
+    ligado: "Ligados. Você recebe check-ins, curtidas, comentários e desafios.",
   };
 
+  const ligado = estado === "ligado";
+
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-suave">{textos[estado]}</p>
+    <section className="cartao p-4">
+      <div className="flex items-start gap-4">
+        <span
+          className={`grid size-12 shrink-0 place-items-center rounded-2xl ${
+            ligado ? "bg-marca-suave text-marca-forte" : "bg-superficie-2 text-suave"
+          }`}
+        >
+          {ligado ? <Bell className="size-6" /> : <BellOff className="size-6" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold">Avisos neste aparelho</p>
+          <p className="mt-0.5 text-sm text-suave">{textos[estado]}</p>
+        </div>
+      </div>
       {estado === "desligado" && (
-        <button className="btn-primario w-full" onClick={ligar} disabled={ocupado}>
-          Ativar notificações
+        <button className="btn-primario mt-4 w-full" onClick={ligar} disabled={ocupado}>
+          {ocupado ? <Loader2 className="size-5 animate-spin" /> : <Bell className="size-5" />} Ativar avisos
         </button>
       )}
-      {estado === "ligado" && (
-        <div className="flex gap-2">
-          <button className="btn flex-1" onClick={() => enviarPushDeTeste()} disabled={ocupado}>
-            Testar
+      {ligado && (
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button className="btn-suave" onClick={() => enviarPushDeTeste()} disabled={ocupado}>
+            Enviar teste
           </button>
-          <button className="btn flex-1" onClick={desligar} disabled={ocupado}>
+          <button className="btn-suave" onClick={desligar} disabled={ocupado}>
             Desligar
           </button>
         </div>
       )}
-    </div>
+    </section>
   );
 }

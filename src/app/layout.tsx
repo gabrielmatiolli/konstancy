@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Figtree } from "next/font/google";
 import { RegistrarServiceWorker } from "@/componentes/RegistrarServiceWorker";
 import "./globals.css";
 
-const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+// Fonte variável servida pelo próprio app (sem Google em runtime): o mesmo
+// desenho em todo sistema, inclusive Android antigo sem fontes modernas.
+const figtree = Figtree({ variable: "--font-figtree", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Saúde Check", template: "%s · Saúde Check" },
@@ -18,14 +20,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0a09" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f6f4" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e1110" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${geist.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${figtree.variable} h-full`}>
       <body className="min-h-full">
         {children}
         <RegistrarServiceWorker />

@@ -1,8 +1,10 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
+import { Heart } from "lucide-react";
 import { alternarCurtida } from "@/acoes/checkins";
 
+/** Curtida otimista: o coração muda no toque, sem esperar a rede (lenta no 4G fraco). */
 export function BotaoCurtir({ checkinId, curtido, total }: { checkinId: string; curtido: boolean; total: number }) {
   const [estado, aplicar] = useOptimistic({ curtido, total }, (atual) => ({
     curtido: !atual.curtido,
@@ -21,9 +23,12 @@ export function BotaoCurtir({ checkinId, curtido, total }: { checkinId: string; 
           await alternarCurtida(checkinId);
         })
       }
-      className="flex min-h-11 items-center gap-1.5 px-2 text-sm"
+      className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-semibold active:bg-superficie-2"
     >
-      <span className={`text-xl ${estado.curtido ? "" : "grayscale opacity-60"}`}>❤️</span>
+      <Heart
+        className={`size-6 transition-transform duration-200 ${estado.curtido ? "scale-110 fill-curtida text-curtida" : ""}`}
+        strokeWidth={1.9}
+      />
       {estado.total > 0 && <span className="tabular-nums">{estado.total}</span>}
     </button>
   );

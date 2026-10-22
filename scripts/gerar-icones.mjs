@@ -1,12 +1,12 @@
 // Ícones provisórios do PWA (até o design definitivo): node scripts/gerar-icones.mjs
 import sharp from "sharp";
 
-const cor = "#16a34a";
+const cor = "#157a3f";
 const svg = (lado, margem) => `
 <svg xmlns="http://www.w3.org/2000/svg" width="${lado}" height="${lado}" viewBox="0 0 100 100">
   <rect width="100" height="100" fill="${cor}"/>
   <g transform="translate(50 50) scale(${1 - margem}) translate(-50 -50)">
-    <path d="M28 52 L44 68 L74 34" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M28 52 L44 68 L74 34" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>`;
 

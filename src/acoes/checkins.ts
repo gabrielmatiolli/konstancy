@@ -8,7 +8,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { exigirUsuario } from "@/lib/auth";
 import { ehMembro, exigirFamilia } from "@/lib/familia";
-import { apagarFotos, salvarFoto } from "@/lib/fotos";
+import { apagarFotos, caminhoDaMedia, salvarFoto } from "@/lib/fotos";
 import { hoje, paraDate } from "@/lib/datas";
 import { membrosExceto, notificar } from "@/lib/push";
 import { deveBorrar, jaFezCheckinHoje } from "@/lib/consultas";
@@ -58,7 +58,7 @@ export async function criarCheckin(_: EstadoDoForm, form: FormData): Promise<Est
       },
     });
   } catch (erro) {
-    await apagarFotos(salva.fotoPath, salva.thumbPath);
+    await apagarFotos(salva.fotoPath, caminhoDaMedia(salva.fotoPath), salva.thumbPath);
     throw erro;
   }
 
@@ -82,7 +82,7 @@ export async function apagarCheckin(checkinId: string) {
   if (!checkin || checkin.usuarioId !== usuario.id) return;
 
   await prisma.checkin.delete({ where: { id: checkinId } });
-  await apagarFotos(checkin.fotoPath, checkin.thumbPath);
+  await apagarFotos(checkin.fotoPath, caminhoDaMedia(checkin.fotoPath), checkin.thumbPath);
   revalidatePath("/", "layout");
   redirect("/");
 }
