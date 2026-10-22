@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Permite abrir o dev server pelo IP da rede local (testar no celular no mesmo Wi-Fi).
-  allowedDevOrigins: ["192.168.0.*", "192.168.1.*", "192.168.15.*"],
+  // Permite abrir o dev server pelo IP da rede local e pelo túnel HTTPS do
+  // Cloudflare (testar câmera e push no celular — ver README).
+  allowedDevOrigins: ["192.168.0.*", "192.168.1.*", "192.168.15.*", "*.trycloudflare.com"],
   experimental: {
     serverActions: {
       // A foto do check-in sobe por Server Action. O celular já comprime para

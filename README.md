@@ -86,9 +86,22 @@ npm run db:seed
 
 4. `npm run dev` e abra http://localhost:3000 — contas de teste no `prisma/seed.ts`.
 
-Push e câmera precisam de HTTPS fora do `localhost`. Para testar no celular pela rede,
-use `npx next dev --experimental-https`. No iPhone, o push só funciona com o app
-instalado na tela de início (iOS 16.4+); a tela de Perfil explica isso ao usuário.
+### Testar no celular (Safari/iPhone)
+
+Aberto por `http://192.168.x.x:3000`, o Safari trata a página como não segura e
+desliga service worker, push, compartilhar e área de transferência. O app avisa e cai
+para alternativas, mas para testar push e o compartilhamento de verdade é preciso
+HTTPS com certificado válido. O `next dev --experimental-https` não serve no iPhone (o
+certificado local não é confiável lá). Use um túnel com o `npm run dev` rodando:
+
+```bash
+npx cloudflared tunnel --url http://localhost:3000
+```
+
+Ele imprime um endereço `https://….trycloudflare.com` público e temporário: abra no
+iPhone, toque em Compartilhar → "Adicionar à Tela de Início", abra o app pelo ícone e
+ative as notificações no Perfil (iOS 16.4+). Feche o túnel ao terminar — enquanto ele
+roda, qualquer pessoa com o endereço alcança o servidor de dev.
 
 ## Deploy na Hostinger
 

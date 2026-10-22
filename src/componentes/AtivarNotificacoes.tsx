@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { enviarPushDeTeste, removerInscricao, salvarInscricao } from "@/acoes/push";
 
-type Estado = "carregando" | "sem-suporte" | "instalar-ios" | "bloqueado" | "desligado" | "ligado";
+type Estado = "carregando" | "sem-https" | "sem-suporte" | "instalar-ios" | "bloqueado" | "desligado" | "ligado";
 
 function chaveVapid(base64: string) {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -29,6 +29,9 @@ export function AtivarNotificacoes() {
 
   useEffect(() => {
     (async () => {
+      // Service worker e push só existem em HTTPS (ou localhost). Aberto pelo
+      // IP da rede em http://, o navegador simplesmente não oferece as APIs.
+      if (!window.isSecureContext) return setEstado("sem-https");
       if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
         return setEstado(ehIOS() && !instalado() ? "instalar-ios" : "sem-suporte");
       }
@@ -80,6 +83,8 @@ export function AtivarNotificacoes() {
 
   const textos: Partial<Record<Estado, string>> = {
     carregando: "Verificando…",
+    "sem-https":
+      "As notificações precisam de conexão segura (https://). Abra o app pelo endereço com https para ativar.",
     "sem-suporte": "Este navegador não suporta notificações.",
     "instalar-ios":
       "No iPhone, as notificações só funcionam com o app instalado: toque em Compartilhar → “Adicionar à Tela de Início” e abra o Saúde Check por lá.",

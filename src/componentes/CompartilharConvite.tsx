@@ -1,32 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+
+/**
+ * Copia texto mesmo sem a Clipboard API — ela (e o navigator.share) só existe
+ * em conexão segura; aberto por http://IP-da-rede no celular, não está lá.
+ */
+async function copiar(texto: string) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    } catch {
+      // permissão negada — tenta o caminho antigo
+    }
+  }
+  const area = document.createElement("textarea");
+  area.value = texto;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.opacity = "0";
+  document.body.appendChild(area);
+  area.select();
+  area.setSelectionRange(0, texto.length); // iOS ignora select() sozinho
+  let ok = false;
+  try {
+    ok = document.execCommand("copy");
+  } catch {
+    ok = false;
+  }
+  area.remove();
+  return ok;
+}
 
 export function CompartilharConvite({ codigo, familia }: { codigo: string; familia: string }) {
-  const [copiado, setCopiado] = useState(false);
+  const [estado, setEstado] = useState<"parado" | "copiado" | "manual">("parado");
+  const [linkManual, setLinkManual] = useState("");
+  const campo = useRef<HTMLInputElement>(null);
 
   async function compartilhar() {
     const url = `${location.origin}/convite/${codigo}`;
     const texto = `Entra na ${familia} no Saúde Check pra gente treinar junto! 💪`;
+
     if (navigator.share) {
       try {
         await navigator.share({ title: "Saúde Check", text: texto, url });
         return;
-      } catch {
-        // cancelado — cai no copiar
+      } catch (erro) {
+        // Fechar a folha de compartilhamento não é erro.
+        if (erro instanceof DOMException && erro.name === "AbortError") return;
       }
     }
-    await navigator.clipboard.writeText(`${texto} ${url}`);
-    setCopiado(true);
-    setTimeout(() => setCopiado(false), 2000);
+
+    if (await copiar(`${texto} ${url}`)) {
+      setEstado("copiado");
+      setTimeout(() => setEstado("parado"), 2000);
+    } else {
+      // Último recurso: mostra o link selecionado para copiar à mão.
+      setLinkManual(url);
+      setEstado("manual");
+      requestAnimationFrame(() => campo.current?.select());
+    }
   }
 
   return (
     <div className="space-y-2">
       <p className="text-center text-3xl font-bold tracking-[0.3em]">{codigo}</p>
       <button type="button" className="btn-primario w-full" onClick={compartilhar}>
-        {copiado ? "Link copiado!" : "Convidar pelo WhatsApp / link"}
+        {estado === "copiado" ? "Link copiado!" : "Convidar pelo WhatsApp / link"}
       </button>
+      {estado === "manual" && (
+        <div className="space-y-1">
+          <p className="text-xs text-suave">Não deu para copiar automaticamente. Segure o link abaixo e copie:</p>
+          <input
+            ref={campo}
+            readOnly
+            value={linkManual}
+            onFocus={(e) => e.currentTarget.select()}
+            className="campo text-sm"
+          />
+        </div>
+      )}
     </div>
   );
 }
