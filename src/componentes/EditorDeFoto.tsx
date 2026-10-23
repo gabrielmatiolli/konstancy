@@ -4,7 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { Camera, Loader2 } from "lucide-react";
 import { removerFoto, trocarFoto } from "@/acoes/perfil";
 import { estadoInicial } from "@/acoes/estado";
-import { comprimirFoto } from "@/lib/comprimirFoto";
+import { comprimirFoto, LIMITE_ENVIO, MENSAGEM_FOTO_GRANDE } from "@/lib/comprimirFoto";
 import { Avatar } from "@/componentes/Avatar";
 import type { Pessoa } from "@/lib/pessoa";
 
@@ -23,6 +23,7 @@ export function EditorDeFoto({ pessoa }: { pessoa: Pessoa }) {
     if (!arquivo) return;
     setErro(null);
     const leve = await comprimirFoto(arquivo, 640);
+    if (leve.size > LIMITE_ENVIO) return setErro(MENSAGEM_FOTO_GRANDE);
     const url = URL.createObjectURL(leve);
     setPrevia(url);
     iniciar(async () => {

@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState, startTransition } from "re
 import { Camera, ImagePlus, Loader2, RefreshCw } from "lucide-react";
 import { criarCheckin } from "@/acoes/checkins";
 import { estadoInicial } from "@/acoes/estado";
-import { comprimirFoto } from "@/lib/comprimirFoto";
+import { comprimirFoto, LIMITE_ENVIO, MENSAGEM_FOTO_GRANDE } from "@/lib/comprimirFoto";
 
 const ATIVIDADES = ["Caminhada", "Corrida", "Academia", "Bike", "Funcional", "Natação", "Yoga", "Futebol", "Dança", "Outra"];
 const DURACOES = [15, 30, 45, 60, 90];
@@ -14,6 +14,7 @@ export function CapturaCheckin() {
   const [foto, setFoto] = useState<Blob | null>(null);
   const [previa, setPrevia] = useState<string | null>(null);
   const [preparando, setPreparando] = useState(false);
+  const [erroFoto, setErroFoto] = useState<string | null>(null);
   const camera = useRef<HTMLInputElement>(null);
   const galeria = useRef<HTMLInputElement>(null);
 
@@ -24,7 +25,14 @@ export function CapturaCheckin() {
   async function escolher(arquivo: File | undefined) {
     if (!arquivo) return;
     setPreparando(true);
+    setErroFoto(null);
     const leve = await comprimirFoto(arquivo);
+    if (leve.size > LIMITE_ENVIO) {
+      // Compressão falhou (formato que o navegador não abre) e o original é grande demais.
+      setErroFoto(MENSAGEM_FOTO_GRANDE);
+      setPreparando(false);
+      return;
+    }
     setFoto(leve);
     setPrevia(URL.createObjectURL(leve));
     setPreparando(false);
@@ -110,6 +118,11 @@ export function CapturaCheckin() {
           className="campo resize-none" />
       </div>
 
+      {erroFoto && (
+        <p className="erro" role="alert">
+          {erroFoto}
+        </p>
+      )}
       {estado.erro && (
         <p className="erro" role="alert">
           {estado.erro}

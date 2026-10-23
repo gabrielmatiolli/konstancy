@@ -1,17 +1,22 @@
 import "server-only";
-import { mkdir, writeFile, readFile, unlink } from "node:fs/promises";
 import path from "node:path";
 import sharp, { type Sharp } from "sharp";
+import { armazenamento } from "@/lib/armazenamento";
 
 /**
- * Armazenamento das fotos em disco. Em produção o STORAGE_DIR fica fora da
- * pasta do app: a Hostinger recria a pasta a cada deploy de ZIP, e arquivos
- * enviados em runtime para /public nem são servidos pelo `next start`.
- *
- * Para trocar por S3/R2 no futuro, basta reimplementar salvarFoto/lerFoto.
+ * Tratamento das fotos (sharp) e gravação no armazenamento — bucket R2 em
+ * produção, pasta local em dev (ver armazenamento.ts). As chaves guardadas no
+ * banco (fotoPath, thumbPath) são as mesmas nos dois.
  */
 
-export const TAMANHO_MAXIMO = 15 * 1024 * 1024;
+/**
+ * A Vercel recusa requisições acima de 4,5 MB. O celular comprime antes
+ * (~300 KB); este limite só pega o caso raro em que a compressão falhou e o
+ * original foi mandado.
+ */
+export const TAMANHO_MAXIMO = 4 * 1024 * 1024;
+const MENSAGEM_GRANDE = "Foto grande demais. Tente tirar outra ou escolher uma menor.";
+
 /*
  * Três tamanhos, pensando em Android de entrada no 4G:
  *   grande  1440px — só na tela do check-in, para dar zoom
@@ -21,20 +26,7 @@ export const TAMANHO_MAXIMO = 15 * 1024 * 1024;
 const LADO_FOTO = 1440;
 const LADO_MEDIA = 720;
 const LADO_THUMB = 240;
-
-function raiz() {
-  return path.resolve(process.env.STORAGE_DIR || "./uploads");
-}
-
-/** Resolve um caminho relativo garantindo que não escapa do STORAGE_DIR. */
-function caminhoAbsoluto(relativo: string) {
-  const base = raiz();
-  const absoluto = path.resolve(base, relativo);
-  if (absoluto !== base && !absoluto.startsWith(base + path.sep)) {
-    throw new Error("Caminho de foto inválido.");
-  }
-  return absoluto;
-}
+const WEBP = "image/webp";
 
 export interface FotoSalva {
   fotoPath: string;
@@ -45,11 +37,11 @@ export interface FotoSalva {
 
 /**
  * Normaliza a foto (gira conforme o EXIF, remove metadados — inclusive GPS —
- * e converte para WebP) e grava a versão grande e a miniatura.
+ * e converte para WebP) e grava a grande, a média e a miniatura.
  */
 export async function salvarFoto(arquivo: File, id: string, dia: string): Promise<FotoSalva> {
   if (arquivo.size === 0) throw new Error("Foto vazia.");
-  if (arquivo.size > TAMANHO_MAXIMO) throw new Error("Foto grande demais (máx. 15 MB).");
+  if (arquivo.size > TAMANHO_MAXIMO) throw new Error(MENSAGEM_GRANDE);
 
   const entrada = Buffer.from(await arquivo.arrayBuffer());
   let base: Sharp;
@@ -64,25 +56,23 @@ export async function salvarFoto(arquivo: File, id: string, dia: string): Promis
   const pasta = path.posix.join("checkins", ano, mes);
   const fotoPath = path.posix.join(pasta, `${id}.webp`);
   const thumbPath = path.posix.join(pasta, `${id}_t.webp`);
-  const mediaPath = caminhoDaMedia(fotoPath);
-
-  await mkdir(caminhoAbsoluto(pasta), { recursive: true });
 
   const { data: foto, info } = await base
     .clone()
     .resize(LADO_FOTO, LADO_FOTO, { fit: "inside", withoutEnlargement: true })
     .webp({ quality: 80 })
     .toBuffer({ resolveWithObject: true });
-  const media = await gerarMedia(foto);
-  const thumb = await base
-    .clone()
-    .resize(LADO_THUMB, LADO_THUMB, { fit: "cover" })
-    .webp({ quality: 65 })
-    .toBuffer();
+  const [media, thumb] = await Promise.all([
+    gerarMedia(foto),
+    base.clone().resize(LADO_THUMB, LADO_THUMB, { fit: "cover" }).webp({ quality: 65 }).toBuffer(),
+  ]);
 
-  await writeFile(caminhoAbsoluto(fotoPath), foto);
-  await writeFile(caminhoAbsoluto(mediaPath), media);
-  await writeFile(caminhoAbsoluto(thumbPath), thumb);
+  const loja = armazenamento();
+  await Promise.all([
+    loja.gravar(fotoPath, foto, WEBP),
+    loja.gravar(caminhoDaMedia(fotoPath), media, WEBP),
+    loja.gravar(thumbPath, thumb, WEBP),
+  ]);
 
   return { fotoPath, thumbPath, largura: info.width, altura: info.height };
 }
@@ -99,8 +89,8 @@ function gerarMedia(foto: Buffer) {
     .toBuffer();
 }
 
-export async function lerFoto(relativo: string) {
-  return readFile(caminhoAbsoluto(relativo));
+export function lerFoto(chave: string) {
+  return armazenamento().ler(chave);
 }
 
 /**
@@ -110,16 +100,17 @@ export async function lerFoto(relativo: string) {
 export async function lerMedia(fotoPath: string) {
   const mediaPath = caminhoDaMedia(fotoPath);
   try {
-    return await readFile(caminhoAbsoluto(mediaPath));
+    return await armazenamento().ler(mediaPath);
   } catch {
     const media = await gerarMedia(await lerFoto(fotoPath));
-    await writeFile(caminhoAbsoluto(mediaPath), media).catch(() => {});
+    await armazenamento().gravar(mediaPath, media, WEBP).catch(() => {});
     return media;
   }
 }
 
-export async function apagarFotos(...relativos: string[]) {
-  await Promise.all(relativos.map((r) => unlink(caminhoAbsoluto(r)).catch(() => {})));
+export async function apagarFotos(...chaves: string[]) {
+  const loja = armazenamento();
+  await Promise.all(chaves.map((c) => loja.apagar(c).catch(() => {})));
 }
 
 // ---------------------------------------------------------------------------
@@ -136,7 +127,7 @@ export function caminhoDoAvatar(usuarioId: string, versao: number) {
 /** Recorte quadrado de 256px (rosto no centro), sem EXIF/GPS — ~10 KB. */
 export async function salvarAvatar(arquivo: File, usuarioId: string, versao: number) {
   if (arquivo.size === 0) throw new Error("Foto vazia.");
-  if (arquivo.size > TAMANHO_MAXIMO) throw new Error("Foto grande demais (máx. 15 MB).");
+  if (arquivo.size > TAMANHO_MAXIMO) throw new Error(MENSAGEM_GRANDE);
 
   let saida: Buffer;
   try {
@@ -149,6 +140,5 @@ export async function salvarAvatar(arquivo: File, usuarioId: string, versao: num
     throw new Error("Arquivo não é uma imagem válida.");
   }
 
-  await mkdir(caminhoAbsoluto("avatares"), { recursive: true });
-  await writeFile(caminhoAbsoluto(caminhoDoAvatar(usuarioId, versao)), saida);
+  await armazenamento().gravar(caminhoDoAvatar(usuarioId, versao), saida, WEBP);
 }

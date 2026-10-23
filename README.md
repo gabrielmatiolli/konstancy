@@ -4,9 +4,9 @@ PWA para a família registrar check-ins diários de atividade física, no estilo
 foto + descrição, curtidas, comentários, push quando alguém treina e desafios com data
 de fim e prêmio.
 
-Stack: Next.js 16 (App Router, Server Actions) · Prisma 7 + MySQL/MariaDB · Web Push
-(VAPID, `web-push`) · `sharp` para as fotos · Tailwind 4. Deploy como app Node.js na
-Hostinger, igual ao RR Film e à Multipatas.
+Stack: Next.js 16 (App Router, Server Actions) · Prisma 7 + PostgreSQL (Neon) · Web Push
+(VAPID, `web-push`) · `sharp` para as fotos, guardadas no Cloudflare R2 · Tailwind 4.
+Deploy na Vercel.
 
 ## Funcionalidades
 
@@ -60,14 +60,15 @@ src/
     comecar/            onboarding sem família
     convite/[codigo]/   link de convite
     api/fotos/[id]/     serve as fotos só para membros (e borra quando precisa)
-    api/cron/           lembrete diário e encerramento de desafios
+    api/cron/[tarefa]/  lembrete diário e encerramento de desafios (cron da Vercel)
     manifest.ts         manifesto do PWA
   componentes/          UI (provisória — o design vem depois)
   lib/
     auth.ts             sessão em cookie JWT (jose) + bcrypt
     familia.ts          família ativa, convites
     datas.ts            "dia civil" em America/Sao_Paulo
-    fotos.ts            sharp → WebP + miniatura, gravado em STORAGE_DIR
+    fotos.ts            sharp → WebP em três tamanhos
+    armazenamento.ts    R2/S3 em produção, pasta local em dev
     push.ts             envio Web Push e limpeza de inscrições mortas
     desafios.ts         placar
     consultas.ts        consultas do feed e regra do borrão
@@ -98,19 +99,26 @@ mais as fotos visíveis.
 
 ## Rodar local
 
-1. Suba o MySQL local (serviço `MySQL80`, precisa de terminal como administrador).
-2. Preencha a senha na `DATABASE_URL` do `.env.local` (caracteres especiais codificados).
-3. Crie o banco e aplique as migrations, depois o seed:
+1. Suba o Postgres local (o `prisma dev`, sem instalar nada além do npm):
 
 ```bash
-npx prisma migrate dev
+npm run db:local
+```
+
+2. Copie o `.env.example` para `.env.local` (a `DATABASE_URL` de exemplo já é a do
+   `prisma dev`) e aplique as migrations e o seed:
+
+```bash
+npm run db:deploy
 ```
 
 ```bash
 npm run db:seed
 ```
 
-4. `npm run dev` e abra http://localhost:3000 — contas de teste no `prisma/seed.ts`.
+3. `npm run dev` e abra http://localhost:3000 — contas de teste no `prisma/seed.ts`.
+   Sem `S3_BUCKET`, as fotos ficam em `./uploads`; sem SMTP, os códigos de e-mail
+   aparecem no terminal.
 
 ### Testar no celular (Safari/iPhone)
 
@@ -129,29 +137,30 @@ iPhone, toque em Compartilhar → "Adicionar à Tela de Início", abra o app pel
 ative as notificações no Perfil (iOS 16.4+). Feche o túnel ao terminar — enquanto ele
 roda, qualquer pessoa com o endereço alcança o servidor de dev.
 
-## Deploy na Hostinger
+## Deploy na Vercel (plano grátis)
 
-1. Crie o `.env` de produção a partir do `.env.example`:
-   - `SESSAO_SEGREDO` e `CRON_SEGREDO` novos (não reaproveitar os de dev);
-   - as chaves VAPID podem ser as mesmas do dev ou novas (`npm run vapid`). **Trocar as
-     chaves depois invalida todas as inscrições de push** — cada um precisa reativar;
-   - `STORAGE_DIR` apontando para uma pasta **fora** da pasta do app (ex.:
-     `/home/<usuario>/konstancy-fotos`), senão as fotos somem no próximo deploy.
-2. Aplique as migrations no banco da Hostinger: `npm run db:deploy`.
-3. `python scripts/empacotar.py` gera `konstancy.zip`; suba como app Node.js.
-4. E-mail: crie uma conta de e-mail no domínio (hPanel → E-mails), por exemplo
-   `nao-responda@dominio`, e preencha `SMTP_*` e `EMAIL_REMETENTE` no `.env`
-   (`smtp.hostinger.com`, porta 465). Configure SPF/DKIM do domínio (o hPanel faz) para
-   os códigos não caírem no spam. Sem SMTP, em produção o envio falha com erro claro.
-5. Cron jobs no hPanel (horário do servidor é UTC):
-   - lembrete às 19h de Brasília → `0 22 * * *`
-     `curl -s -H "Authorization: Bearer $CRON_SEGREDO" "https://<dominio>/api/cron?tarefa=lembrete"`
-   - encerrar desafios às 0h10 de Brasília → `10 3 * * *`
-     `curl -s -H "Authorization: Bearer $CRON_SEGREDO" "https://<dominio>/api/cron?tarefa=encerrar"`
+Peças, todas com plano gratuito: **Vercel** (app), **Neon** (Postgres, criado pelo painel
+da Vercel), **Cloudflare R2** (fotos) e **Gmail** (e-mail dos códigos). O plano Hobby da
+Vercel é para uso pessoal/não comercial — ao cobrar pelo app, é preciso o Pro.
+
+1. Código no GitHub (repositório privado) e projeto importado na Vercel.
+2. Vercel → Storage → **Neon**: cria o banco e as variáveis `DATABASE_URL` e
+   `DATABASE_URL_UNPOOLED`. Escolha a região mais perto de São Paulo; o `vercel.json` põe
+   as funções em `gru1` (São Paulo) — se o banco ficar em outra região, troque lá para a
+   mesma (ex.: `iad1` para Virginia), porque cada página faz várias consultas.
+3. Cloudflare → R2: crie o bucket (`konstancy-fotos`) e um token de API "Object Read &
+   Write" para ele. As fotos continuam passando pelo app (`/api/fotos`), que confere a
+   família e aplica o borrão — o bucket fica privado.
+4. Gmail: verificação em duas etapas + "senha de app"; `smtp.gmail.com`, porta 465.
+5. Variáveis no painel da Vercel — a lista completa está no `.env.example` (as de
+   produção geradas ficam no `.env.producao.local`, fora do git).
+6. Deploy. O script `vercel-build` aplica as migrations no Neon antes do build (só em
+   produção, nunca em deploys de prévia) — ver `scripts/migrar-producao.mjs`.
+7. Os crons do `vercel.json` (lembrete às 19h e encerramento à 0h10, horário de Brasília)
+   passam a rodar sozinhos; no Hobby, uma vez por dia, em algum minuto da hora marcada.
 
 ## Próximos passos
 
 - Design (Figma) e ícones definitivos.
 - Foto de perfil, reações com emoji, "dupla câmera" (frente + traseira) como no BeReal.
-- Trocar o `STORAGE_DIR` por S3/R2 se o volume de fotos crescer (`src/lib/fotos.ts`).
 - Recuperação de senha por e-mail.

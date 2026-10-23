@@ -10,16 +10,15 @@ config({ path: ".env.local", quiet: true });
 config({ quiet: true });
 
 import bcrypt from "bcryptjs";
-import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { urlDoDriver } from "../src/lib/urlDoBanco";
 
 const url = process.env.DATABASE_URL!;
 if (!/@(localhost|127\.0\.0\.1)[:/]/.test(url)) {
-  throw new Error("O seed só roda contra o MySQL local.");
+  throw new Error("O seed só roda contra o Postgres local (npm run db:local).");
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaMariaDb(urlDoDriver(url), { useTextProtocol: true }) });
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 
 const CONTAS = [
   { nome: "Ana Teste", email: "ana@teste.local", telefone: "+5511900000001" },

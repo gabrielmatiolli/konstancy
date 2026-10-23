@@ -1,7 +1,7 @@
 /**
  * Datas civis ("dias") no fuso da família.
  *
- * O servidor da Hostinger roda em UTC: às 22h de Itatiba já é amanhã lá. Todo
+ * O servidor (Vercel) roda em UTC: às 22h de Itatiba já é amanhã lá. Todo
  * check-in grava o dia civil de São Paulo numa coluna DATE, e as contas de
  * desafio/painel trabalham com strings "AAAA-MM-DD" para não misturar fusos.
  */

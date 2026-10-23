@@ -1,0 +1,5 @@
+# Quebras de linha fixas: a migration do Prisma tem checksum — CRLF no
+# Windows faria o banco local acusar migration "modificada".
+* text=auto
+*.sql text eol=lf
+*.prisma text eol=lf

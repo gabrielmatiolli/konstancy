@@ -2,9 +2,10 @@ import "server-only";
 import nodemailer, { type Transporter } from "nodemailer";
 
 /**
- * Envio de e-mail por SMTP — a conta de e-mail do domínio na Hostinger serve
- * (smtp.hostinger.com, porta 465). Sem SMTP configurado, em desenvolvimento o
- * e-mail é impresso no terminal do `next dev`; em produção, falha alto.
+ * Envio de e-mail por SMTP. Sem custo: Gmail com "senha de app"
+ * (smtp.gmail.com, porta 465). Com domínio próprio, qualquer SMTP serve. Sem
+ * SMTP configurado, em desenvolvimento o e-mail é impresso no terminal do
+ * `next dev`; em produção, falha alto.
  */
 
 let transporte: Transporter | null | undefined;

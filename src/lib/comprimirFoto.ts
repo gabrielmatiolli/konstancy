@@ -12,6 +12,10 @@
 const LADO_ENVIO = 1600;
 const QUALIDADE = 0.8;
 
+/** Acima disto a Vercel recusa o envio (limite de 4,5 MB por requisição). */
+export const LIMITE_ENVIO = 4 * 1024 * 1024;
+export const MENSAGEM_FOTO_GRANDE = "Essa foto ficou grande demais para enviar. Tente tirar outra ou escolher uma menor.";
+
 /** Dimensões já com a orientação do EXIF aplicada (o <img> faz isso desde 2020). */
 function carregarImagem(url: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {

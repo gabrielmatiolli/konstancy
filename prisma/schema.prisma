@@ -1,8 +1,7 @@
 // Prisma schema do Konstancy — check-ins diários de atividade física em família.
 // Docs: https://pris.ly/d/prisma-schema
 //
-// Regras do MySQL 8 / MariaDB (ver README): nada de @default em TEXT/JSON;
-// campo curto com default vira VARCHAR(n).
+// PostgreSQL (Neon em produção, `prisma dev` local).
 
 generator client {
   provider = "prisma-client"
@@ -10,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
 }
 
 // ---------------------------------------------------------------------------

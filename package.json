@@ -12,11 +12,14 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "vapid": "web-push generate-vapid-keys"
+    "vapid": "web-push generate-vapid-keys",
+    "vercel-build": "node scripts/migrar-producao.mjs && next build --webpack",
+    "db:local": "prisma dev --name konstancy --detach"
   },
   "dependencies": {
-    "@prisma/adapter-mariadb": "^7.10.1",
+    "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "aws4fetch": "^1.0.20",
     "bcryptjs": "^3.0.3",
     "dotenv": "^18.0.8",
     "jose": "^6.2.13",

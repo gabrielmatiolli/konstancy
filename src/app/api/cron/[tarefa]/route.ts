@@ -5,26 +5,25 @@ import { hoje, paraDate } from "@/lib/datas";
 import { notificar } from "@/lib/push";
 
 /**
- * Tarefas agendadas, chamadas pelo cron da Hostinger (ver README):
- *   /api/cron?tarefa=lembrete  — fim de tarde: avisa quem ainda não treinou hoje
- *   /api/cron?tarefa=encerrar  — madrugada: fecha desafios vencidos e anuncia o vencedor
- * Autenticação por `Authorization: Bearer <CRON_SEGREDO>` ou `?chave=`.
+ * Tarefas agendadas pelo cron da Vercel (vercel.json):
+ *   /api/cron/lembrete  — fim de tarde: avisa quem ainda não treinou hoje
+ *   /api/cron/encerrar  — madrugada: fecha desafios vencidos e anuncia o vencedor
+ * A Vercel chama com `Authorization: Bearer <CRON_SECRET>`; sem o segredo, 401.
+ * No plano Hobby cada cron roda uma vez por dia, em algum momento da hora marcada.
  */
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: RouteContext<"/api/cron/[tarefa]">) {
   if (!autorizado(request)) return new Response("Não autorizado", { status: 401 });
 
-  const tarefa = new URL(request.url).searchParams.get("tarefa");
+  const { tarefa } = await params;
   if (tarefa === "lembrete") return Response.json(await lembrete());
   if (tarefa === "encerrar") return Response.json(await encerrarDesafios());
-  return new Response("Tarefa desconhecida", { status: 400 });
+  return new Response("Tarefa desconhecida", { status: 404 });
 }
 
 function autorizado(request: Request) {
-  const segredo = process.env.CRON_SEGREDO;
+  const segredo = process.env.CRON_SECRET;
   if (!segredo) return false;
-  const url = new URL(request.url);
-  const recebido =
-    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? url.searchParams.get("chave") ?? "";
+  const recebido = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
   const a = Buffer.from(recebido);
   const b = Buffer.from(segredo);
   return a.length === b.length && timingSafeEqual(a, b);

@@ -6,9 +6,9 @@ const nextConfig = {
   experimental: {
     serverActions: {
       // A foto do check-in sobe por Server Action. O celular já comprime para
-      // ~0,5 MB, mas o fallback (HEIC sem suporte a canvas) manda o original;
-      // salvarFoto() aceita até 15 MB.
-      bodySizeLimit: "16mb",
+      // ~0,3 MB; o teto acompanha o da Vercel (4,5 MB por requisição) e a tela
+      // avisa antes de tentar mandar algo maior.
+      bodySizeLimit: "4.5mb",
     },
   },
   async headers() {
