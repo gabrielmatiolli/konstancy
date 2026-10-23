@@ -42,11 +42,18 @@ function criarS3(): Armazenamento {
 
   return {
     async gravar(chave, conteudo, tipo) {
-      const resposta = await cliente.fetch(url(chave), {
+      // Só ASSINA com a aws4fetch e envia com um fetch comum. `cliente.fetch`
+      // entrega um objeto Request com corpo, e o fetch do Next.js o reenvia
+      // como fluxo (transfer-encoding: chunked), sem Content-Length — o R2
+      // recusa com 411 "Length Required". Com o corpo pronto e o tamanho
+      // declarado, o envio sai inteiro.
+      const corpo = new Uint8Array(conteudo);
+      const assinada = await cliente.sign(url(chave), {
         method: "PUT",
-        body: new Uint8Array(conteudo),
-        headers: { "Content-Type": tipo },
+        body: corpo,
+        headers: { "Content-Type": tipo, "Content-Length": String(corpo.byteLength) },
       });
+      const resposta = await fetch(assinada.url, { method: "PUT", headers: assinada.headers, body: corpo });
       if (!resposta.ok) throw new Error(`Falha ao gravar foto (${resposta.status}).`);
     },
     async ler(chave) {
