@@ -8,10 +8,10 @@ import "./globals.css";
 const figtree = Figtree({ variable: "--font-figtree", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Saúde Check", template: "%s · Saúde Check" },
+  title: { default: "Konstancy", template: "%s · Konstancy" },
   description: "Check-ins diários de atividade física em família.",
-  applicationName: "Saúde Check",
-  appleWebApp: { capable: true, title: "Saúde Check", statusBarStyle: "default" },
+  applicationName: "Konstancy",
+  appleWebApp: { capable: true, title: "Konstancy", statusBarStyle: "default" },
   formatDetection: { telephone: false },
 };
 

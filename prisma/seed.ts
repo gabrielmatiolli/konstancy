@@ -1,6 +1,7 @@
 /**
- * Dados de desenvolvimento: uma família de teste com três contas e um desafio.
- * Senha de todas as contas: teste123 — só para o banco local.
+ * Dados de desenvolvimento: uma família de teste com três contas.
+ * Senha de todas as contas: teste123 — só para o banco local. Entram por
+ * e-mail ou pelo celular de teste abaixo (números fictícios).
  *
  *   npm run db:seed
  */
@@ -21,9 +22,9 @@ if (!/@(localhost|127\.0\.0\.1)[:/]/.test(url)) {
 const prisma = new PrismaClient({ adapter: new PrismaMariaDb(urlDoDriver(url), { useTextProtocol: true }) });
 
 const CONTAS = [
-  { nome: "Ana Teste", email: "ana@teste.local" },
-  { nome: "Bruno Teste", email: "bruno@teste.local" },
-  { nome: "Carla Teste", email: "carla@teste.local" },
+  { nome: "Ana Teste", email: "ana@teste.local", telefone: "+5511900000001" },
+  { nome: "Bruno Teste", email: "bruno@teste.local", telefone: "+5511900000002" },
+  { nome: "Carla Teste", email: "carla@teste.local", telefone: "+5511900000003" },
 ];
 
 async function main() {
@@ -39,7 +40,7 @@ async function main() {
     const usuario = await prisma.usuario.upsert({
       where: { email: conta.email },
       create: { ...conta, senhaHash, familiaAtivaId: familia.id },
-      update: {},
+      update: { telefone: conta.telefone },
     });
     await prisma.membro.upsert({
       where: { usuarioId_familiaId: { usuarioId: usuario.id, familiaId: familia.id } },

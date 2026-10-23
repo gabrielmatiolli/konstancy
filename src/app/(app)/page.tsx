@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Camera, CheckCircle2, Users } from "lucide-react";
+import { Camera, CheckCircle2, ChevronRight, MailWarning, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { exigirFamilia } from "@/lib/familia";
 import { checkinsDaFamilia, deveBorrar, type CheckinDoCartao } from "@/lib/consultas";
 import { deDate, hoje, rotuloDia, somarDias } from "@/lib/datas";
@@ -21,7 +22,7 @@ export default async function PaginaInicio() {
     checkinsDaFamilia(familia.id, usuario.id, somarDias(dia, -(DIAS_NO_FEED - 1)), dia),
     prisma.membro.findMany({
       where: { familiaId: familia.id },
-      select: { usuario: { select: { id: true, nome: true } } },
+      select: { usuario: { select: selecaoPessoa } },
       orderBy: { entrouEm: "asc" },
     }),
   ]);
@@ -46,6 +47,20 @@ export default async function PaginaInicio() {
   return (
     <div className="space-y-5">
       <Topo sobretitulo={familia.nome} titulo={rotuloDia(dia)} />
+
+      {!usuario.emailVerificado && (
+        <Link
+          href="/confirmar-email?depois=/"
+          className="flex items-center gap-3 rounded-2xl border border-ouro/40 bg-ouro/10 px-4 py-3 text-sm active:scale-[0.99]"
+        >
+          <MailWarning className="size-5 shrink-0 text-ouro" />
+          <span className="min-w-0 flex-1">
+            <strong className="block">Confirme seu e-mail</strong>
+            <span className="text-suave">Sem isso, não dá para recuperar a senha.</span>
+          </span>
+          <ChevronRight className="size-5 shrink-0 text-suave" />
+        </Link>
+      )}
 
       <section aria-label="Quem já treinou hoje" className="cartao p-4">
         <div className="mb-3 flex items-baseline justify-between">

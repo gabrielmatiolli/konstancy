@@ -1,4 +1,4 @@
-# Saúde Check
+# Konstancy
 
 PWA para a família registrar check-ins diários de atividade física, no estilo BeReal:
 foto + descrição, curtidas, comentários, push quando alguém treina e desafios com data
@@ -28,6 +28,13 @@ outros ficam borradas até você postar a sua. O borrão é aplicado no servidor
 **Regra dos desafios:** vence quem fizer check-in em mais dias distintos entre o início
 e o fim. Vários check-ins no mesmo dia contam uma vez; empate divide o prêmio. O placar é
 calculado na hora a partir dos check-ins (`src/lib/desafios.ts`).
+
+**Conta:** login com e-mail **ou** celular e senha. O e-mail é confirmado por um código
+de 6 números (não bloqueia o uso; o app avisa até confirmar), e é por ele que a senha é
+recuperada: código no e-mail → senha nova → as outras sessões caem. Códigos guardados
+só como HMAC, valem 15 min, 5 tentativas, 1 envio por minuto e 5 por hora. Foto de
+perfil em 256px (`/api/avatar/[id]`), visível só para quem divide uma família. SMS ainda
+não: o celular é guardado em E.164 (`+5511…`) para um provedor entrar depois.
 
 **Push enviado quando:** alguém da família faz check-in · curtem seu check-in ·
 comentam no seu check-in (ou numa conversa em que você comentou) · sai um desafio novo ·
@@ -129,10 +136,14 @@ roda, qualquer pessoa com o endereço alcança o servidor de dev.
    - as chaves VAPID podem ser as mesmas do dev ou novas (`npm run vapid`). **Trocar as
      chaves depois invalida todas as inscrições de push** — cada um precisa reativar;
    - `STORAGE_DIR` apontando para uma pasta **fora** da pasta do app (ex.:
-     `/home/<usuario>/saude-check-fotos`), senão as fotos somem no próximo deploy.
+     `/home/<usuario>/konstancy-fotos`), senão as fotos somem no próximo deploy.
 2. Aplique as migrations no banco da Hostinger: `npm run db:deploy`.
-3. `python scripts/empacotar.py` gera `saude-check.zip`; suba como app Node.js.
-4. Cron jobs no hPanel (horário do servidor é UTC):
+3. `python scripts/empacotar.py` gera `konstancy.zip`; suba como app Node.js.
+4. E-mail: crie uma conta de e-mail no domínio (hPanel → E-mails), por exemplo
+   `nao-responda@dominio`, e preencha `SMTP_*` e `EMAIL_REMETENTE` no `.env`
+   (`smtp.hostinger.com`, porta 465). Configure SPF/DKIM do domínio (o hPanel faz) para
+   os códigos não caírem no spam. Sem SMTP, em produção o envio falha com erro claro.
+5. Cron jobs no hPanel (horário do servidor é UTC):
    - lembrete às 19h de Brasília → `0 22 * * *`
      `curl -s -H "Authorization: Bearer $CRON_SEGREDO" "https://<dominio>/api/cron?tarefa=lembrete"`
    - encerrar desafios às 0h10 de Brasília → `10 3 * * *`

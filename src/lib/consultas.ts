@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { deDate, hoje, paraDate } from "@/lib/datas";
 
 /** Campos que o cartão de check-in precisa, já com "eu curti?" do usuário. */
@@ -14,7 +15,7 @@ export function selecaoDoCartao(usuarioId: string) {
     largura: true,
     altura: true,
     usuarioId: true,
-    usuario: { select: { id: true, nome: true } },
+    usuario: { select: selecaoPessoa },
     curtidas: { where: { usuarioId }, select: { usuarioId: true } },
     _count: { select: { curtidas: true, comentarios: true } },
   } as const;

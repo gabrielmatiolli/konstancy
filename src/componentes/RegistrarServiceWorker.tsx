@@ -25,11 +25,11 @@ export function RegistrarServiceWorker() {
     function aoOferecer(evento: Event) {
       evento.preventDefault(); // o app mostra o próprio botão "Instalar"
       window.__promptInstalacao = evento as EventoInstalacao;
-      window.dispatchEvent(new Event("saudecheck:instalavel"));
+      window.dispatchEvent(new Event("konstancy:instalavel"));
     }
     function aoInstalar() {
       window.__promptInstalacao = null;
-      window.dispatchEvent(new Event("saudecheck:instalavel"));
+      window.dispatchEvent(new Event("konstancy:instalavel"));
     }
     window.addEventListener("beforeinstallprompt", aoOferecer);
     window.addEventListener("appinstalled", aoInstalar);

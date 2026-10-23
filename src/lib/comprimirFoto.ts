@@ -22,11 +22,11 @@ function carregarImagem(url: string) {
   });
 }
 
-export async function comprimirFoto(arquivo: File): Promise<Blob> {
+export async function comprimirFoto(arquivo: File, ladoMaximo = LADO_ENVIO): Promise<Blob> {
   const url = URL.createObjectURL(arquivo);
   try {
     const img = await carregarImagem(url);
-    const escala = Math.min(1, LADO_ENVIO / Math.max(img.naturalWidth, img.naturalHeight));
+    const escala = Math.min(1, ladoMaximo / Math.max(img.naturalWidth, img.naturalHeight));
     const largura = Math.round(img.naturalWidth * escala);
     const altura = Math.round(img.naturalHeight * escala);
 

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { exigirFamilia } from "@/lib/familia";
 import { deDate, diasEntre, hoje, paraDate, rotuloCurto, rotuloSemana, somarDias } from "@/lib/datas";
 import { deveBorrar, jaFezCheckinHoje } from "@/lib/consultas";
@@ -29,7 +30,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
   const [membros, checkins, postouHoje] = await Promise.all([
     prisma.membro.findMany({
       where: { familiaId: familia.id },
-      select: { usuario: { select: { id: true, nome: true } } },
+      select: { usuario: { select: selecaoPessoa } },
       orderBy: { entrouEm: "asc" },
     }),
     prisma.checkin.findMany({

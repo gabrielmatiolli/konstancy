@@ -41,11 +41,11 @@ export function CompartilharConvite({ codigo, familia }: { codigo: string; famil
 
   async function compartilhar() {
     const url = `${location.origin}/convite/${codigo}`;
-    const texto = `Entra na ${familia} no Saúde Check pra gente treinar junto! 💪`;
+    const texto = `Entra na ${familia} no Konstancy pra gente treinar junto! 💪`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Saúde Check", text: texto, url });
+        await navigator.share({ title: "Konstancy", text: texto, url });
         return;
       } catch (erro) {
         // Fechar a folha de compartilhamento não é erro.

@@ -121,3 +121,34 @@ export async function lerMedia(fotoPath: string) {
 export async function apagarFotos(...relativos: string[]) {
   await Promise.all(relativos.map((r) => unlink(caminhoAbsoluto(r)).catch(() => {})));
 }
+
+// ---------------------------------------------------------------------------
+// Foto de perfil
+// ---------------------------------------------------------------------------
+
+const LADO_AVATAR = 256;
+
+/** Um arquivo por versão: a URL carrega a versão e o cache longo nunca serve a foto velha. */
+export function caminhoDoAvatar(usuarioId: string, versao: number) {
+  return path.posix.join("avatares", `${usuarioId}-${versao}.webp`);
+}
+
+/** Recorte quadrado de 256px (rosto no centro), sem EXIF/GPS — ~10 KB. */
+export async function salvarAvatar(arquivo: File, usuarioId: string, versao: number) {
+  if (arquivo.size === 0) throw new Error("Foto vazia.");
+  if (arquivo.size > TAMANHO_MAXIMO) throw new Error("Foto grande demais (máx. 15 MB).");
+
+  let saida: Buffer;
+  try {
+    saida = await sharp(Buffer.from(await arquivo.arrayBuffer()), { failOn: "error" })
+      .rotate()
+      .resize(LADO_AVATAR, LADO_AVATAR, { fit: "cover", position: "attention" })
+      .webp({ quality: 80 })
+      .toBuffer();
+  } catch {
+    throw new Error("Arquivo não é uma imagem válida.");
+  }
+
+  await mkdir(caminhoAbsoluto("avatares"), { recursive: true });
+  await writeFile(caminhoAbsoluto(caminhoDoAvatar(usuarioId, versao)), saida);
+}

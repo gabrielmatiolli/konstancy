@@ -15,15 +15,29 @@ export default async function PaginaEntrar({ searchParams }: PageProps<"/entrar"
       <Formulario acao={entrar} textoBotao="Entrar" textoEnviando="Entrando…">
         <input type="hidden" name="de" value={typeof de === "string" ? de : ""} />
         <div>
-          <label className="rotulo" htmlFor="email">
-            E-mail
+          <label className="rotulo" htmlFor="identificador">
+            E-mail ou celular
           </label>
-          <input id="email" name="email" type="email" autoComplete="email" required className="campo" />
+          <input
+            id="identificador"
+            name="identificador"
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder="voce@email.com ou (11) 98765-4321"
+            required
+            className="campo"
+          />
         </div>
         <div>
-          <label className="rotulo" htmlFor="senha">
-            Senha
-          </label>
+          <div className="flex items-baseline justify-between">
+            <label className="rotulo" htmlFor="senha">
+              Senha
+            </label>
+            <Link href="/recuperar" className="text-sm font-semibold text-marca-forte">
+              Esqueci a senha
+            </Link>
+          </div>
           <input
             id="senha"
             name="senha"

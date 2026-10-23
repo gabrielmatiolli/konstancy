@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { deDate, diasEntre, diferencaEmDias, hoje, paraDate, somarDias } from "@/lib/datas";
 
 export type StatusDoDesafio = "agendado" | "ativo" | "encerrado";
@@ -13,6 +14,7 @@ export function statusDoDesafio(desafio: { dataInicio: Date; dataFim: Date }, di
 export interface LinhaDoPlacar {
   usuarioId: string;
   nome: string;
+  avatarVersao: number;
   /** Dias com pelo menos um check-in dentro do período do desafio. */
   dias: number;
   /** Dias seguidos com check-in, terminando hoje ou ontem. */
@@ -45,7 +47,7 @@ export async function calcularPlacar(desafio: {
 
   const participantes = await prisma.participante.findMany({
     where: { desafioId: desafio.id },
-    select: { usuario: { select: { id: true, nome: true } } },
+    select: { usuario: { select: selecaoPessoa } },
   });
   const ids = participantes.map((p) => p.usuario.id);
 
@@ -69,7 +71,13 @@ export async function calcularPlacar(desafio: {
   const linhas = participantes
     .map(({ usuario }) => {
       const dias = porUsuario.get(usuario.id) ?? new Set<string>();
-      return { usuarioId: usuario.id, nome: usuario.nome, dias: dias.size, sequencia: sequenciaAtual(dias, ateHoje) };
+      return {
+        usuarioId: usuario.id,
+        nome: usuario.nome,
+        avatarVersao: usuario.avatarVersao,
+        dias: dias.size,
+        sequencia: sequenciaAtual(dias, ateHoje),
+      };
     })
     .sort((a, b) => b.dias - a.dias || b.sequencia - a.sequencia || a.nome.localeCompare(b.nome, "pt-BR"));
 

@@ -36,6 +36,21 @@ export default async function PaginaCadastro({ searchParams }: PageProps<"/cadas
             E-mail
           </label>
           <input id="email" name="email" type="email" autoComplete="email" required className="campo" />
+          <p className="mt-1 text-xs text-suave">Vamos mandar um código para confirmar. É por ele que você recupera a senha.</p>
+        </div>
+        <div>
+          <label className="rotulo" htmlFor="telefone">
+            Celular <span className="font-normal text-suave">(opcional, para entrar com ele)</span>
+          </label>
+          <input
+            id="telefone"
+            name="telefone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            placeholder="(11) 98765-4321"
+            className="campo"
+          />
         </div>
         <div>
           <label className="rotulo" htmlFor="senha">

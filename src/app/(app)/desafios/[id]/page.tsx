@@ -120,7 +120,7 @@ export default async function PaginaDesafio({ params }: PageProps<"/desafios/[id
                 >
                   {l.posicao}
                 </span>
-                <Avatar usuario={{ id: l.usuarioId, nome: l.nome }} tamanho={36} />
+                <Avatar usuario={{ id: l.usuarioId, nome: l.nome, avatarVersao: l.avatarVersao }} tamanho={36} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">{eu ? "Você" : l.nome}</span>
                   {status !== "encerrado" && l.sequencia >= 2 && (

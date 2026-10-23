@@ -5,7 +5,7 @@ import { Download, Share, Smartphone, X } from "lucide-react";
 
 type Modo = "oculto" | "android" | "ios";
 
-const CHAVE_DISPENSADO = "saudecheck:instalar-dispensado";
+const CHAVE_DISPENSADO = "konstancy:instalar-dispensado";
 
 function ehIOS() {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -38,8 +38,8 @@ export function InstalarApp({ dispensavel = false }: { dispensavel?: boolean }) 
       setModo(ehIOS() ? "ios" : "oculto");
     }
     avaliar();
-    window.addEventListener("saudecheck:instalavel", avaliar);
-    return () => window.removeEventListener("saudecheck:instalavel", avaliar);
+    window.addEventListener("konstancy:instalavel", avaliar);
+    return () => window.removeEventListener("konstancy:instalavel", avaliar);
   }, [dispensavel]);
 
   if (modo === "oculto") return null;
@@ -70,7 +70,7 @@ export function InstalarApp({ dispensavel = false }: { dispensavel?: boolean }) 
         <Smartphone className="size-6" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="pr-8 font-bold">Instale o Saúde Check</p>
+        <p className="pr-8 font-bold">Instale o Konstancy</p>
         {modo === "android" ? (
           <>
             <p className="mt-0.5 text-sm text-suave">Abre mais rápido, em tela cheia, e recebe os avisos da família.</p>

@@ -1,4 +1,4 @@
-// Service worker do Saúde Check: recebe Web Push e abre a tela certa ao tocar.
+// Service worker do Konstancy: recebe Web Push e abre a tela certa ao tocar.
 // Sem cache offline por enquanto — o app depende do servidor para tudo.
 
 self.addEventListener("install", () => self.skipWaiting());
@@ -10,7 +10,7 @@ self.addEventListener("push", (event) => {
   try {
     dados = event.data.json();
   } catch {
-    dados = { titulo: "Saúde Check", corpo: event.data.text(), url: "/" };
+    dados = { titulo: "Konstancy", corpo: event.data.text(), url: "/" };
   }
 
   event.waitUntil(

@@ -14,7 +14,8 @@ export function Avatar({
   tamanho = 36,
   marcado,
 }: {
-  usuario: { id: string; nome: string };
+  /** Sem `avatarVersao` (ou 0), mostra a inicial colorida. */
+  usuario: { id: string; nome: string; avatarVersao?: number };
   tamanho?: number;
   /** Fez check-in hoje: anel e selo verdes. */
   marcado?: boolean;
@@ -28,7 +29,21 @@ export function Avatar({
         } ${marcado ? "ring-[3px] ring-marca ring-offset-2 ring-offset-fundo" : ""}`}
         style={{ background: corDe(usuario.id), fontSize: tamanho * 0.42 }}
       >
-        {usuario.nome.trim().charAt(0).toUpperCase()}
+        {usuario.avatarVersao ? (
+          // A versão na URL troca a cada foto nova: o cache longo nunca mostra a antiga.
+          // eslint-disable-next-line @next/next/no-img-element -- 256px já otimizada no servidor
+          <img
+            src={`/api/avatar/${usuario.id}?v=${usuario.avatarVersao}`}
+            alt=""
+            width={tamanho}
+            height={tamanho}
+            loading="lazy"
+            decoding="async"
+            className="size-full rounded-full object-cover"
+          />
+        ) : (
+          usuario.nome.trim().charAt(0).toUpperCase()
+        )}
       </span>
       {marcado && (
         <span className="absolute -right-1 -bottom-1 grid size-5 place-items-center rounded-full border-2 border-fundo bg-marca text-white">

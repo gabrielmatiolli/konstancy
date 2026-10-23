@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "saude-check",
+      "name": "konstancy",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
@@ -11,7 +11,7 @@
       "port": 3000
     },
     {
-      "name": "saude-check-prod",
+      "name": "konstancy-prod",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",

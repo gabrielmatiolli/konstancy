@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Saúde Check",
-    short_name: "Saúde Check",
+    name: "Konstancy",
+    short_name: "Konstancy",
     description: "Check-ins diários de atividade física em família.",
     lang: "pt-BR",
     start_url: "/",

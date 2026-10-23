@@ -1,4 +1,4 @@
-// Prisma schema do Saúde Check — check-ins diários de atividade física em família.
+// Prisma schema do Konstancy — check-ins diários de atividade física em família.
 // Docs: https://pris.ly/d/prisma-schema
 //
 // Regras do MySQL 8 / MariaDB (ver README): nada de @default em TEXT/JSON;
@@ -18,24 +18,31 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model Usuario {
-  id           String   @id @default(cuid())
-  nome         String   @db.VarChar(80)
-  email        String   @unique @db.VarChar(191)
-  senhaHash    String   @db.VarChar(100)
+  id                String    @id @default(cuid())
+  nome              String    @db.VarChar(80)
+  email             String    @unique @db.VarChar(191)
+  /// Celular em E.164 ("+5511987654321"). Opcional; também serve de login.
+  telefone          String?   @unique @db.VarChar(20)
+  /// Nulo até a pessoa digitar o código enviado ao e-mail.
+  emailVerificadoEm DateTime?
+  senhaHash         String    @db.VarChar(100)
+  /// 0 = sem foto. Sobe a cada troca: entra no nome do arquivo e na URL, para o cache não servir a antiga.
+  avatarVersao      Int       @default(0)
   /// Incrementado em troca de senha / "sair de todos os aparelhos": invalida os cookies antigos.
-  versaoSessao Int      @default(0)
+  versaoSessao      Int       @default(0)
   /// Família exibida no app quando a pessoa participa de mais de uma.
-  familiaAtivaId String?
-  criadoEm     DateTime @default(now())
+  familiaAtivaId    String?
+  criadoEm          DateTime  @default(now())
 
-  familiaAtiva    Familia?        @relation("familiaAtiva", fields: [familiaAtivaId], references: [id], onDelete: SetNull)
+  familiaAtiva    Familia?            @relation("familiaAtiva", fields: [familiaAtivaId], references: [id], onDelete: SetNull)
   membros         Membro[]
   checkins        Checkin[]
   comentarios     Comentario[]
   curtidas        Curtida[]
   inscricoesPush  InscricaoPush[]
+  codigos         CodigoVerificacao[]
   participacoes   Participante[]
-  desafiosCriados Desafio[]       @relation("criadorDoDesafio")
+  desafiosCriados Desafio[]           @relation("criadorDoDesafio")
 
   @@index([familiaAtivaId])
 }
@@ -47,13 +54,13 @@ enum PapelNaFamilia {
 }
 
 model Familia {
-  id            String   @id @default(cuid())
-  nome          String   @db.VarChar(80)
+  id              String   @id @default(cuid())
+  nome            String   @db.VarChar(80)
   /// Código curto usado no link de convite (/convite/CODIGO).
-  codigoConvite String   @unique @db.VarChar(12)
+  codigoConvite   String   @unique @db.VarChar(12)
   /// Estilo BeReal: as fotos do dia ficam borradas até a pessoa postar a dela.
-  borrarAtePostar Boolean @default(true)
-  criadoEm      DateTime @default(now())
+  borrarAtePostar Boolean  @default(true)
+  criadoEm        DateTime @default(now())
 
   membros        Membro[]
   checkins       Checkin[]
@@ -183,4 +190,31 @@ model InscricaoPush {
   usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
+}
+
+// ---------------------------------------------------------------------------
+// Códigos por e-mail
+// ---------------------------------------------------------------------------
+
+enum FinalidadeDoCodigo {
+  CONFIRMAR_EMAIL
+  RECUPERAR_SENHA
+}
+
+/// Código de 6 dígitos enviado por e-mail. Só o HMAC fica no banco; vale 15 min e 5 tentativas.
+model CodigoVerificacao {
+  id         String             @id @default(cuid())
+  usuarioId  String
+  finalidade FinalidadeDoCodigo
+  codigoHash String             @db.VarChar(64)
+  /// Para onde foi enviado — se a pessoa trocar o e-mail, o código antigo não confirma o novo.
+  destino    String             @db.VarChar(191)
+  tentativas Int                @default(0)
+  expiraEm   DateTime
+  usadoEm    DateTime?
+  criadoEm   DateTime           @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId, finalidade, criadoEm])
 }

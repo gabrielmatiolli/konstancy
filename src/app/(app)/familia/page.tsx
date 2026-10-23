@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { exigirFamilia } from "@/lib/familia";
 import {
   atualizarFamilia,
@@ -25,7 +26,7 @@ export default async function PaginaFamilia() {
   const [membros, minhasFamilias] = await Promise.all([
     prisma.membro.findMany({
       where: { familiaId: familia.id },
-      include: { usuario: { select: { id: true, nome: true } } },
+      include: { usuario: { select: selecaoPessoa } },
       orderBy: { entrouEm: "asc" },
     }),
     prisma.membro.findMany({

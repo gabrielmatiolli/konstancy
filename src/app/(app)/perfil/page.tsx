@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { CalendarCheck, Camera, ChevronRight, Flame, LogOut, Users } from "lucide-react";
+import { CalendarCheck, Camera, ChevronRight, Flame, LogOut, Pencil, UserPen, Users } from "lucide-react";
+import { formatarTelefone } from "@/lib/telefone";
 import { prisma } from "@/lib/prisma";
 import { exigirFamilia } from "@/lib/familia";
 import { deDate, hoje, somarDias } from "@/lib/datas";
@@ -35,9 +36,17 @@ export default async function PaginaPerfil() {
   return (
     <div className="space-y-5">
       <header className="flex flex-col items-center pt-4 text-center">
-        <Avatar usuario={usuario} tamanho={80} />
+        <Link href="/perfil/editar" aria-label="Editar perfil e foto" className="relative rounded-full active:scale-95">
+          <Avatar usuario={usuario} tamanho={88} />
+          <span className="absolute right-0 bottom-0 grid size-8 place-items-center rounded-full border-[3px] border-fundo bg-superficie-2 text-texto">
+            <Pencil className="size-3.5" />
+          </span>
+        </Link>
         <h1 className="mt-3 text-2xl font-extrabold">{usuario.nome}</h1>
-        <p className="text-sm text-suave">{usuario.email}</p>
+        <p className="text-sm text-suave">
+          {usuario.email}
+          {usuario.telefone && ` · ${formatarTelefone(usuario.telefone)}`}
+        </p>
       </header>
 
       <section className="grid grid-cols-3 gap-3">
@@ -54,6 +63,15 @@ export default async function PaginaPerfil() {
       <InstalarApp />
 
       <nav className="cartao divide-y divide-borda overflow-hidden">
+        <Link href="/perfil/editar" className="flex min-h-16 items-center gap-4 px-4 active:bg-superficie-2">
+          <UserPen className="size-5 text-suave" />
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold">Editar perfil</span>
+            <span className="block truncate text-sm text-suave">Foto, nome, e-mail e celular</span>
+          </span>
+          {!usuario.emailVerificado && <span className="size-2.5 rounded-full bg-ouro" aria-label="E-mail não confirmado" />}
+          <ChevronRight className="size-5 text-suave" />
+        </Link>
         <Link href="/familia" className="flex min-h-16 items-center gap-4 px-4 active:bg-superficie-2">
           <Users className="size-5 text-suave" />
           <span className="min-w-0 flex-1">

@@ -1,6 +1,7 @@
 import { Trash } from "lucide-react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { selecaoPessoa } from "@/lib/pessoa";
 import { exigirFamilia } from "@/lib/familia";
 import { deveBorrar, jaFezCheckinHoje, selecaoDoCartao } from "@/lib/consultas";
 import { tempoRelativo } from "@/lib/datas";
@@ -26,7 +27,7 @@ export default async function PaginaCheckin({ params }: PageProps<"/checkin/[id]
       familia: { select: { borrarAtePostar: true } },
       comentarios: {
         orderBy: { criadoEm: "asc" },
-        select: { id: true, texto: true, criadoEm: true, usuario: { select: { id: true, nome: true } } },
+        select: { id: true, texto: true, criadoEm: true, usuario: { select: selecaoPessoa } },
       },
     },
   });

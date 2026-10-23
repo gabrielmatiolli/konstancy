@@ -1,4 +1,4 @@
-"""Gera saude-check.zip para subir como app Node.js na Hostinger.
+"""Gera konstancy.zip para subir como app Node.js na Hostinger.
 
 Mesmo formato do pacote da Multipatas: o projeto-fonte com `package.json` na raiz
 do ZIP, sem `node_modules` nem `.next` — a Hostinger instala, faz o build e sobe
@@ -16,7 +16,7 @@ import zipfile
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
-DESTINO = RAIZ / "saude-check.zip"
+DESTINO = RAIZ / "konstancy.zip"
 
 # Pastas que nunca entram: dependências e build são refeitos no servidor.
 PASTAS_FORA = {

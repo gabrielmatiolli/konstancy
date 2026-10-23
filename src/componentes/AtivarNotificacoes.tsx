@@ -88,7 +88,7 @@ export function AtivarNotificacoes() {
       "As notificações precisam de conexão segura (https://). Abra o app pelo endereço com https para ativar.",
     "sem-suporte": "Este navegador não suporta notificações.",
     "instalar-ios":
-      "No iPhone, as notificações só funcionam com o app instalado: toque em Compartilhar → “Adicionar à Tela de Início” e abra o Saúde Check por lá.",
+      "No iPhone, as notificações só funcionam com o app instalado: toque em Compartilhar → “Adicionar à Tela de Início” e abra o Konstancy por lá.",
     bloqueado:
       "Os avisos estão bloqueados para este app. No Android: toque no cadeado ao lado do endereço (ou segure o ícone do app → Informações) → Notificações → Permitir.",
     desligado: "Saiba na hora quando alguém da família treinar, curtir ou comentar.",
