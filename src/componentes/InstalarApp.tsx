@@ -66,11 +66,11 @@ export function InstalarApp({ dispensavel = false }: { dispensavel?: boolean }) 
 
   return (
     <section className="cartao surgir relative flex gap-4 p-4">
-      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+      <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-marca-suave text-marca-forte">
         <Smartphone className="size-6" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="pr-8 font-bold">Instale o Konstancy</p>
+        <p className="pr-8 font-normal">Instale o Konstancy</p>
         {modo === "android" ? (
           <>
             <p className="mt-0.5 text-sm text-suave">Abre mais rápido, em tela cheia, e recebe os avisos da família.</p>

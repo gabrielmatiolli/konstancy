@@ -43,12 +43,12 @@ export function BotaoReenviar({
         className={
           destaque
             ? "btn-primario w-full"
-            : "min-h-11 px-4 text-[15px] font-semibold text-marca-forte disabled:text-suave"
+            : "min-h-11 px-4 text-[15px] font-medium text-marca-forte disabled:text-suave"
         }
       >
         {pendente ? "Enviando…" : restam > 0 ? `${texto} em ${restam} s` : texto}
       </button>
-      {estado.ok && <p className="text-sm font-semibold text-marca-forte">Código enviado!</p>}
+      {estado.ok && <p className="text-sm font-medium text-marca-forte">Código enviado!</p>}
       {estado.erro && <p className="erro">{estado.erro}</p>}
     </form>
   );

@@ -23,11 +23,11 @@ export function BotaoCurtir({ checkinId, curtido, total }: { checkinId: string; 
           await alternarCurtida(checkinId);
         })
       }
-      className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-semibold active:bg-superficie-2"
+      className="flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-normal active:bg-superficie-2"
     >
       <Heart
-        className={`size-6 transition-transform duration-200 ${estado.curtido ? "scale-110 fill-curtida text-curtida" : ""}`}
-        strokeWidth={1.9}
+        className={`size-[22px] transition-transform duration-200 ${estado.curtido ? "scale-110 fill-curtida text-curtida" : ""}`}
+        strokeWidth={1.6}
       />
       {estado.total > 0 && <span className="tabular-nums">{estado.total}</span>}
     </button>

@@ -32,13 +32,13 @@ export default async function PaginaEditarPerfil() {
           </label>
           <input id="email" name="email" type="email" defaultValue={usuario.email} autoComplete="email" required className="campo" />
           {usuario.emailVerificado ? (
-            <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-marca-forte">
+            <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-marca-forte">
               <CheckCircle2 className="size-4" /> Confirmado
             </p>
           ) : (
             <Link
               href="/confirmar-email?depois=/perfil/editar"
-              className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-ouro"
+              className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-perigo"
             >
               <MailWarning className="size-4" /> Não confirmado — toque para confirmar
             </Link>

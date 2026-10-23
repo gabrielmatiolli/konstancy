@@ -78,11 +78,11 @@ export default async function PaginaDesafios() {
                         status === "encerrado" ? "opacity-75" : ""
                       }`}
                     >
-                      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-ouro/15 text-ouro">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-marca-suave text-marca-forte">
                         <Trophy className="size-6" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate font-bold">{d.titulo}</span>
+                        <span className="block truncate font-normal">{d.titulo}</span>
                         <span className="block truncate text-sm text-suave">{d.premio}</span>
                         {placar ? (
                           <>
@@ -92,13 +92,13 @@ export default async function PaginaDesafios() {
                                 style={{ width: `${(placar.diasDecorridos / placar.totalDias) * 100}%` }}
                               />
                             </span>
-                            <span className="mt-1.5 block text-xs font-semibold text-suave">
+                            <span className="mt-1.5 block text-xs font-medium text-suave">
                               {restam === 0 ? "Último dia" : `Faltam ${restam} dia${restam === 1 ? "" : "s"}`}
                               {minha && ` · você está em ${minha.posicao}º`}
                             </span>
                           </>
                         ) : (
-                          <span className="mt-1 block text-xs font-semibold text-suave">
+                          <span className="mt-1 block text-xs font-medium text-suave">
                             {rotuloCurto(deDate(d.dataInicio))} → {rotuloCurto(deDate(d.dataFim))} ·{" "}
                             {d._count.participantes} participante{d._count.participantes === 1 ? "" : "s"}
                           </span>

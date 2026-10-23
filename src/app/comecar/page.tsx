@@ -18,17 +18,17 @@ export default async function PaginaComecar() {
     <main className="mx-auto w-full max-w-sm space-y-5 px-5 py-10">
       <div className="mb-2 flex flex-col items-center text-center">
         <Marca tamanho={56} />
-        <h1 className="mt-4 text-[26px] font-extrabold">Oi, {usuario.nome.split(" ")[0]}!</h1>
+        <h1 className="mt-4 text-[26px] font-light">Oi, {usuario.nome.split(" ")[0]}!</h1>
         <p className="text-suave">Para começar, entre na família de vocês.</p>
       </div>
 
       <section className="cartao p-5">
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+          <span className="grid size-11 place-items-center rounded-xl bg-marca-suave text-marca-forte">
             <Ticket className="size-5" />
           </span>
           <div>
-            <h2 className="font-bold">Recebi um convite</h2>
+            <h2 className="font-normal">Recebi um convite</h2>
             <p className="text-sm text-suave">Digite o código que te mandaram.</p>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default async function PaginaComecar() {
             autoCapitalize="characters"
             autoComplete="off"
             required
-            className="campo text-center text-xl font-bold tracking-[0.3em] uppercase"
+            className="campo text-center text-xl font-normal tracking-[0.3em] uppercase"
           />
         </Formulario>
       </section>
@@ -51,11 +51,11 @@ export default async function PaginaComecar() {
 
       <section className="cartao p-5">
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-superficie-2 text-suave">
+          <span className="grid size-11 place-items-center rounded-xl bg-superficie-2 text-suave">
             <UsersRound className="size-5" />
           </span>
           <div>
-            <h2 className="font-bold">Sou o primeiro</h2>
+            <h2 className="font-normal">Sou o primeiro</h2>
             <p className="text-sm text-suave">Crie a família e convide o pessoal.</p>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default async function PaginaComecar() {
       </section>
 
       <form action={sair} className="text-center">
-        <button className="min-h-11 px-4 text-sm font-semibold text-suave">Sair da conta</button>
+        <button className="min-h-11 px-4 text-sm font-medium text-suave">Sair da conta</button>
       </form>
     </main>
   );

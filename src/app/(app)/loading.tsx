@@ -9,8 +9,8 @@ export default function Carregando() {
         <div className="esqueleto h-4 w-28 rounded-full" />
         <div className="esqueleto h-7 w-44 rounded-full" />
       </div>
-      <div className="esqueleto h-32 rounded-3xl" />
-      <div className="esqueleto h-80 rounded-3xl" />
+      <div className="esqueleto h-32 rounded-2xl" />
+      <div className="esqueleto h-80 rounded-2xl" />
     </div>
   );
 }

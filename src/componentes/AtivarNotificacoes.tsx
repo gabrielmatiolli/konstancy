@@ -101,14 +101,14 @@ export function AtivarNotificacoes() {
     <section className="cartao p-4">
       <div className="flex items-start gap-4">
         <span
-          className={`grid size-12 shrink-0 place-items-center rounded-2xl ${
+          className={`grid size-12 shrink-0 place-items-center rounded-xl ${
             ligado ? "bg-marca-suave text-marca-forte" : "bg-superficie-2 text-suave"
           }`}
         >
           {ligado ? <Bell className="size-6" /> : <BellOff className="size-6" />}
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-bold">Avisos neste aparelho</p>
+          <p className="font-normal">Avisos neste aparelho</p>
           <p className="mt-0.5 text-sm text-suave">{textos[estado]}</p>
         </div>
       </div>

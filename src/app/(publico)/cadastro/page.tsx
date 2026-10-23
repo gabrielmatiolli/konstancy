@@ -19,7 +19,7 @@ export default async function PaginaCadastro({ searchParams }: PageProps<"/cadas
   return (
     <>
       {familia && (
-        <p className="mb-6 rounded-2xl bg-marca-suave p-4 text-center text-[15px] text-marca-forte">
+        <p className="mb-6 rounded-xl bg-marca-suave p-4 text-center text-[15px] text-marca-forte">
           Você foi convidado para <strong>{familia.nome}</strong>. Crie sua conta para entrar.
         </p>
       )}
@@ -69,7 +69,7 @@ export default async function PaginaCadastro({ searchParams }: PageProps<"/cadas
       </Formulario>
       <p className="mt-6 text-center text-[15px] text-suave">
         Já tem conta?{" "}
-        <Link href="/entrar" className="font-bold text-marca-forte">
+        <Link href="/entrar" className="font-normal text-marca-forte">
           Entrar
         </Link>
       </p>

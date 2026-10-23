@@ -34,7 +34,7 @@ export default async function PaginaEntrar({ searchParams }: PageProps<"/entrar"
             <label className="rotulo" htmlFor="senha">
               Senha
             </label>
-            <Link href="/recuperar" className="text-sm font-semibold text-marca-forte">
+            <Link href="/recuperar" className="text-sm font-medium text-marca-forte">
               Esqueci a senha
             </Link>
           </div>
@@ -50,7 +50,7 @@ export default async function PaginaEntrar({ searchParams }: PageProps<"/entrar"
       </Formulario>
       <p className="mt-6 text-center text-[15px] text-suave">
         Primeira vez?{" "}
-        <Link href="/cadastro" className="font-bold text-marca-forte">
+        <Link href="/cadastro" className="font-normal text-marca-forte">
           Criar conta
         </Link>
       </p>

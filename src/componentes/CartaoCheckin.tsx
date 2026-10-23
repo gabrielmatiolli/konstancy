@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Lock, MessageCircle } from "lucide-react";
+import { Lock, MessageCircle } from "lucide-react";
 import { Avatar } from "@/componentes/Avatar";
 import { BotaoCurtir } from "@/componentes/BotaoCurtir";
 import { tempoRelativo } from "@/lib/datas";
@@ -49,11 +49,11 @@ export function CartaoCheckin({
       />
       {borrado && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/25 p-6 text-center text-white">
-          <span className="grid size-12 place-items-center rounded-full bg-white/20">
+          <span className="grid size-12 place-items-center rounded-xl bg-white/20">
             <Lock className="size-6" />
           </span>
-          <p className="max-w-[16rem] font-semibold">Faça o seu check-in de hoje para ver</p>
-          <Link href="/checkin/novo" className="btn min-h-10 border-transparent bg-white px-4 text-sm text-black">
+          <p className="max-w-[16rem] font-normal">Faça o seu check-in de hoje para ver</p>
+          <Link href="/checkin/novo" className="btn min-h-10 border-transparent bg-marca px-4 text-sm font-medium text-marca-texto">
             Fazer check-in
           </Link>
         </div>
@@ -64,24 +64,16 @@ export function CartaoCheckin({
   return (
     <article className={`cartao overflow-hidden ${completo ? "" : "leve"}`}>
       <header className="flex items-center gap-3 px-4 py-3">
-        <Avatar usuario={checkin.usuario} tamanho={40} />
+        <Avatar usuario={checkin.usuario} tamanho={38} />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-bold">{checkin.usuario.nome}</p>
-          <p className="flex items-center gap-1.5 truncate text-[13px] text-suave">
-            {tempoRelativo(checkin.criadoEm)}
-            {checkin.duracaoMin && (
-              <>
-                <span aria-hidden>·</span>
-                <Clock className="size-3.5" /> {checkin.duracaoMin} min
-              </>
-            )}
-          </p>
+          <p className="truncate text-[15px] font-normal">{checkin.usuario.nome}</p>
+          {(checkin.atividade || checkin.duracaoMin) && (
+            <p className="truncate text-xs font-medium tracking-[0.02em] text-marca-forte">
+              {[checkin.atividade, checkin.duracaoMin && `${checkin.duracaoMin} min`].filter(Boolean).join(" · ")}
+            </p>
+          )}
         </div>
-        {checkin.atividade && (
-          <span className="shrink-0 rounded-full bg-marca-suave px-3 py-1 text-xs font-bold text-marca-forte">
-            {checkin.atividade}
-          </span>
-        )}
+        <span className="shrink-0 text-xs text-suave">{tempoRelativo(checkin.criadoEm)}</span>
       </header>
 
       {completo || borrado ? foto : <Link href={`/checkin/${checkin.id}`}>{foto}</Link>}
@@ -97,15 +89,15 @@ export function CartaoCheckin({
             {!completo && (
               <Link
                 href={`/checkin/${checkin.id}#comentarios`}
-                className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-[15px] font-semibold active:bg-superficie-2"
+                className="flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-normal active:bg-superficie-2"
                 aria-label={`${checkin._count.comentarios} comentários`}
               >
-                <MessageCircle className="size-6" strokeWidth={1.9} />
+                <MessageCircle className="size-[22px]" strokeWidth={1.6} />
                 {checkin._count.comentarios > 0 && <span className="tabular-nums">{checkin._count.comentarios}</span>}
               </Link>
             )}
           </div>
-          {checkin.descricao && <p className="px-2 pb-1 text-[15px] whitespace-pre-line">{checkin.descricao}</p>}
+          {checkin.descricao && <p className="px-2 pb-1 text-[15px] font-normal whitespace-pre-line text-suave">{checkin.descricao}</p>}
         </div>
       )}
     </article>

@@ -93,3 +93,25 @@ export function tempoRelativo(instante: Date): string {
   if (h < 24) return `há ${h} h`;
   return `${rotuloCurto(diaDe(instante))} ${hora(instante)}`;
 }
+
+/** Segunda-feira da semana do dia (a semana da grade vai de segunda a domingo). */
+export function inicioDaSemana(dia: string): string {
+  const diaDaSemana = paraDate(dia).getUTCDay(); // 0 = domingo
+  return somarDias(dia, -((diaDaSemana + 6) % 7));
+}
+
+const formatoDiaLongo = new Intl.DateTimeFormat("pt-BR", { weekday: "long", timeZone: "UTC" });
+const formatoMes = new Intl.DateTimeFormat("pt-BR", { month: "short", timeZone: "UTC" });
+
+/** "SEXTA · 23 OUT" — rótulo do topo do início. */
+export function rotuloDataCurta(dia: string): string {
+  const d = paraDate(dia);
+  const semana = formatoDiaLongo.format(d).split("-")[0];
+  const mes = formatoMes.format(d).replace(".", "");
+  return `${semana} · ${d.getUTCDate()} ${mes}`.toUpperCase();
+}
+
+/** "S" — inicial do dia da semana, para o cabeçalho da grade. */
+export function inicialDaSemana(dia: string): string {
+  return rotuloSemana(dia).charAt(0).toUpperCase();
+}

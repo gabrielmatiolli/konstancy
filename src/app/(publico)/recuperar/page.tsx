@@ -9,10 +9,10 @@ export default function PaginaRecuperar() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center text-center">
-        <span className="mb-3 grid size-14 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+        <span className="mb-3 grid size-14 place-items-center rounded-xl bg-marca-suave text-marca-forte">
           <KeyRound className="size-7" />
         </span>
-        <h1 className="text-xl font-extrabold">Esqueceu a senha?</h1>
+        <h1 className="text-xl font-light">Esqueceu a senha?</h1>
         <p className="mt-1 text-[15px] text-suave">Mandamos um código para o e-mail da sua conta.</p>
       </div>
       <Formulario acao={pedirRecuperacao} textoBotao="Enviar código" textoEnviando="Enviando…">
@@ -31,7 +31,7 @@ export default function PaginaRecuperar() {
           />
         </div>
       </Formulario>
-      <Link href="/entrar" className="block min-h-11 text-center text-[15px] font-semibold text-suave">
+      <Link href="/entrar" className="block min-h-11 text-center text-[15px] font-medium text-suave">
         Voltar para o login
       </Link>
     </div>

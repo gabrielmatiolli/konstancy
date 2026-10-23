@@ -34,7 +34,7 @@ export function Formulario({
         </p>
       )}
       {estado.ok && mensagemOk && !pendente && (
-        <p className="flex items-center gap-1.5 text-sm font-semibold text-marca-forte" role="status">
+        <p className="flex items-center gap-1.5 text-sm font-medium text-marca-forte" role="status">
           <Check className="size-4" /> {mensagemOk}
         </p>
       )}

@@ -57,7 +57,7 @@ export function CapturaCheckin() {
         onChange={(e) => escolher(e.target.files?.[0])} />
 
       {previa ? (
-        <div className="relative overflow-hidden rounded-3xl bg-superficie-2">
+        <div className="relative overflow-hidden rounded-2xl bg-superficie-2">
           {/* eslint-disable-next-line @next/next/no-img-element -- prévia local (blob:) */}
           <img src={previa} alt="Prévia do check-in" className="max-h-[60svh] w-full object-cover" />
           <button type="button" onClick={() => camera.current?.click()}
@@ -68,15 +68,15 @@ export function CapturaCheckin() {
       ) : (
         <div className="space-y-3">
           <button type="button" onClick={() => camera.current?.click()} disabled={preparando}
-            className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-marca/50 bg-marca-suave text-marca-forte transition-transform active:scale-[0.99]">
+            className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-marca/50 bg-marca-suave text-marca-forte transition-transform active:scale-[0.99]">
             {preparando ? (
               <Loader2 className="size-10 animate-spin" />
             ) : (
-              <span className="grid size-16 place-items-center rounded-full bg-marca-forte text-white dark:text-marca-texto">
+              <span className="grid size-16 place-items-center rounded-2xl bg-marca text-marca-texto">
                 <Camera className="size-8" />
               </span>
             )}
-            <span className="text-lg font-bold">{preparando ? "Preparando a foto…" : "Tirar foto do treino"}</span>
+            <span className="text-lg font-normal">{preparando ? "Preparando a foto…" : "Tirar foto do treino"}</span>
           </button>
           <button type="button" className="btn-suave w-full" onClick={() => galeria.current?.click()} disabled={preparando}>
             <ImagePlus className="size-5" /> Escolher da galeria

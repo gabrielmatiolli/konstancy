@@ -26,10 +26,10 @@ export default async function PaginaConfirmarEmail({ searchParams }: PageProps<"
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center text-center">
-        <span className="mb-3 grid size-14 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+        <span className="mb-3 grid size-14 place-items-center rounded-xl bg-marca-suave text-marca-forte">
           <MailCheck className="size-7" />
         </span>
-        <h1 className="text-xl font-extrabold">Confirme seu e-mail</h1>
+        <h1 className="text-xl font-light">Confirme seu e-mail</h1>
         <p className="mt-1 text-[15px] text-suave">
           {pendente ? "Enviamos um código de 6 números para" : "Vamos enviar um código de 6 números para"}{" "}
           <strong className="text-texto">{mascararEmail(usuario.email)}</strong>.
@@ -49,7 +49,7 @@ export default async function PaginaConfirmarEmail({ searchParams }: PageProps<"
         <BotaoReenviar acao={enviarConfirmacao} texto="Enviar código" destaque />
       )}
 
-      <Link href={depois} className="block min-h-11 text-center text-[15px] font-semibold text-suave">
+      <Link href={depois} className="block min-h-11 text-center text-[15px] font-medium text-suave">
         Fazer depois
       </Link>
     </div>

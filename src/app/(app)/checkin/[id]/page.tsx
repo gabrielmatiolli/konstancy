@@ -76,8 +76,8 @@ export default async function PaginaCheckin({ params }: PageProps<"/checkin/[id]
                 <li key={c.id} className="surgir flex gap-3">
                   <Avatar usuario={c.usuario} tamanho={34} />
                   <div className="min-w-0 flex-1">
-                    <div className="rounded-2xl rounded-tl-md bg-superficie px-4 py-2.5">
-                      <p className="text-sm font-bold">{c.usuario.id === usuario.id ? "Você" : c.usuario.nome}</p>
+                    <div className="rounded-xl rounded-tl-md bg-superficie px-4 py-2.5">
+                      <p className="text-sm font-normal">{c.usuario.id === usuario.id ? "Você" : c.usuario.nome}</p>
                       <p className="text-[15px] break-words whitespace-pre-line">{c.texto}</p>
                     </div>
                     <p className="mt-1 flex items-center gap-3 pl-2 text-xs text-suave">
@@ -87,7 +87,7 @@ export default async function PaginaCheckin({ params }: PageProps<"/checkin/[id]
                           acao={apagarComentario.bind(null, c.id)}
                           pergunta="Apagar este comentário?"
                           textoConfirmar="Apagar"
-                          className="min-h-8 font-semibold"
+                          className="min-h-8 font-medium"
                         >
                           Apagar
                         </BotaoConfirmar>

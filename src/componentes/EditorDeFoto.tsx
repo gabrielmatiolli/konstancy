@@ -62,7 +62,7 @@ export function EditorDeFoto({ pessoa }: { pessoa: Pessoa }) {
         ) : (
           <Avatar usuario={pessoa} tamanho={96} />
         )}
-        <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-[3px] border-fundo bg-marca-forte text-white dark:text-marca-texto">
+        <span className="absolute right-0 bottom-0 grid size-9 place-items-center rounded-full border-[3px] border-fundo bg-marca text-marca-texto">
           {pendente ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
         </span>
       </button>
@@ -71,7 +71,7 @@ export function EditorDeFoto({ pessoa }: { pessoa: Pessoa }) {
           type="button"
           onClick={() => entrada.current?.click()}
           disabled={pendente}
-          className="min-h-10 rounded-full px-3 text-sm font-semibold text-marca-forte active:bg-superficie-2"
+          className="min-h-10 rounded-lg px-3 text-sm font-medium text-marca-forte active:bg-superficie-2"
         >
           {pessoa.avatarVersao ? "Trocar foto" : "Adicionar foto"}
         </button>
@@ -80,7 +80,7 @@ export function EditorDeFoto({ pessoa }: { pessoa: Pessoa }) {
             type="button"
             disabled={pendente}
             onClick={() => iniciar(async () => void (await removerFoto()))}
-            className="min-h-10 rounded-full px-3 text-sm font-semibold text-suave active:bg-superficie-2"
+            className="min-h-10 rounded-lg px-3 text-sm font-medium text-suave active:bg-superficie-2"
           >
             Remover
           </button>

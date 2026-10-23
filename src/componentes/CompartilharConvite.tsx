@@ -66,7 +66,7 @@ export function CompartilharConvite({ codigo, familia }: { codigo: string; famil
 
   return (
     <div className="space-y-3">
-      <p className="rounded-2xl bg-superficie-2 py-3 text-center text-3xl font-extrabold tracking-[0.3em] tabular-nums select-all">
+      <p className="rounded-xl bg-superficie-2 py-3 text-center text-3xl font-light tracking-[0.3em] tabular-nums select-all">
         {codigo}
       </p>
       <button type="button" className="btn-primario w-full" onClick={compartilhar}>

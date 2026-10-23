@@ -23,10 +23,10 @@ export default async function PaginaCodigoDeRecuperacao() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center text-center">
-        <span className="mb-3 grid size-14 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+        <span className="mb-3 grid size-14 place-items-center rounded-xl bg-marca-suave text-marca-forte">
           <MailCheck className="size-7" />
         </span>
-        <h1 className="text-xl font-extrabold">Digite o código</h1>
+        <h1 className="text-xl font-light">Digite o código</h1>
         <p className="mt-1 text-[15px] text-suave">
           Enviamos 6 números para <strong className="text-texto">{mascararEmail(usuario.email)}</strong>.
         </p>
@@ -36,7 +36,7 @@ export default async function PaginaCodigoDeRecuperacao() {
       </Formulario>
       <p className="text-center text-sm text-suave">Não chegou? Olhe também no spam.</p>
       <BotaoReenviar acao={reenviarRecuperacao} esperaInicial={pendente?.esperaReenvio ?? 0} />
-      <Link href="/entrar" className="block min-h-11 text-center text-[15px] font-semibold text-suave">
+      <Link href="/entrar" className="block min-h-11 text-center text-[15px] font-medium text-suave">
         Voltar para o login
       </Link>
     </div>

@@ -17,6 +17,8 @@ export interface LinhaDoPlacar {
   avatarVersao: number;
   /** Dias com pelo menos um check-in dentro do período do desafio. */
   dias: number;
+  /** Quais dias ("AAAA-MM-DD") — para desenhar a grade. */
+  datas: Set<string>;
   /** Dias seguidos com check-in, terminando hoje ou ontem. */
   sequencia: number;
   posicao: number;
@@ -76,6 +78,7 @@ export async function calcularPlacar(desafio: {
         nome: usuario.nome,
         avatarVersao: usuario.avatarVersao,
         dias: dias.size,
+        datas: dias,
         sequencia: sequenciaAtual(dias, ateHoje),
       };
     })

@@ -22,7 +22,7 @@ export function CampoCodigo({ autoFocus = true }: { autoFocus?: boolean }) {
         campo.value = campo.value.replace(/\D/g, "").slice(0, 6);
         if (campo.value.length === 6) campo.form?.requestSubmit();
       }}
-      className="campo text-center text-3xl font-extrabold tracking-[0.5em] tabular-nums placeholder:tracking-[0.5em]"
+      className="campo text-center text-3xl font-light tracking-[0.5em] tabular-nums placeholder:tracking-[0.5em]"
     />
   );
 }

@@ -59,7 +59,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
     <div>
       <Topo titulo="Painel" sobretitulo={familia.nome} />
 
-      <nav aria-label="Período" className="mb-4 grid grid-cols-3 rounded-2xl bg-superficie-2 p-1">
+      <nav aria-label="Período" className="mb-4 grid grid-cols-3 rounded-xl bg-superficie-2 p-1">
         {PERIODOS.map((p) => (
           <Link
             key={p}
@@ -67,7 +67,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
             replace
             scroll={false}
             aria-current={p === periodo ? "page" : undefined}
-            className={`grid min-h-10 place-items-center rounded-xl text-sm font-bold transition-colors ${
+            className={`grid min-h-10 place-items-center rounded-xl text-sm font-normal transition-colors ${
               p === periodo ? "bg-superficie text-texto shadow-sm" : "text-suave"
             }`}
           >
@@ -84,7 +84,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
         . Toque numa foto para abrir.
       </p>
 
-      <div className="cartao -mx-4 overflow-x-auto rounded-none border-x-0 sm:mx-0 sm:rounded-3xl sm:border-x">
+      <div className="cartao -mx-4 overflow-x-auto rounded-none border-x-0 sm:mx-0 sm:rounded-2xl sm:border-x">
         <table className="border-separate border-spacing-0 text-sm">
           <thead>
             <tr>
@@ -94,7 +94,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
               {colunas.map((d) => (
                 <th
                   key={d}
-                  className={`min-w-12 px-0.5 pt-3 pb-1 text-center text-[11px] leading-tight font-semibold ${
+                  className={`min-w-12 px-0.5 pt-3 pb-1 text-center text-[11px] leading-tight font-medium ${
                     d === fim ? "text-marca-forte" : "text-suave"
                   }`}
                 >
@@ -110,8 +110,8 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
                 <th scope="row" className="sticky left-0 z-10 bg-superficie py-1.5 pr-2 pl-3 text-left font-normal">
                   <span className="flex items-center gap-2">
                     <Avatar usuario={m} tamanho={30} />
-                    <span className="w-16 truncate font-semibold">{m.id === usuario.id ? "Você" : m.nome.split(" ")[0]}</span>
-                    <span className="min-w-6 rounded-full bg-marca-suave px-1.5 py-0.5 text-center text-xs font-bold tabular-nums text-marca-forte">
+                    <span className="w-16 truncate font-medium">{m.id === usuario.id ? "Você" : m.nome.split(" ")[0]}</span>
+                    <span className="min-w-6 rounded-md bg-marca-suave px-1.5 py-0.5 text-center text-xs font-normal tabular-nums text-marca-forte">
                       {m.dias.size}
                     </span>
                   </span>
@@ -143,7 +143,7 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
                             </span>
                           )}
                           {doDia.length > 1 && (
-                            <span className="absolute right-0.5 bottom-0.5 rounded-md bg-black/65 px-1 text-[10px] font-bold text-white">
+                            <span className="absolute right-0.5 bottom-0.5 rounded-md bg-black/65 px-1 text-[10px] font-normal text-white">
                               {doDia.length}
                             </span>
                           )}
@@ -159,13 +159,13 @@ export default async function PaginaPainel({ searchParams }: PageProps<"/painel"
           </tbody>
           <tfoot>
             <tr>
-              <th className="sticky left-0 z-10 bg-superficie px-3 pt-2 pb-3 text-left text-xs font-semibold text-suave">
+              <th className="sticky left-0 z-10 bg-superficie px-3 pt-2 pb-3 text-left text-xs font-medium text-suave">
                 Treinaram
               </th>
               {colunas.map((d) => {
                 const n = linhas.filter((m) => m.dias.has(d)).length;
                 return (
-                  <td key={d} className="px-0.5 pt-2 pb-3 text-center text-xs font-semibold tabular-nums text-suave">
+                  <td key={d} className="px-0.5 pt-2 pb-3 text-center text-xs font-medium tabular-nums text-suave">
                     {n}/{linhas.length}
                   </td>
                 );

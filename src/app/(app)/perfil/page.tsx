@@ -28,7 +28,7 @@ export default async function PaginaPerfil() {
   for (let d = conjunto.has(hoje()) ? hoje() : somarDias(hoje(), -1); conjunto.has(d); d = somarDias(d, -1)) sequencia++;
 
   const numeros = [
-    { valor: sequencia, rotulo: "seguidos", Icone: Flame, cor: "text-fogo" },
+    { valor: sequencia, rotulo: "seguidos", Icone: Flame, cor: "text-marca-forte" },
     { valor: conjunto.size, rotulo: "dias ativos", Icone: CalendarCheck, cor: "text-marca-forte" },
     { valor: total, rotulo: "check-ins", Icone: Camera, cor: "text-suave" },
   ];
@@ -42,7 +42,7 @@ export default async function PaginaPerfil() {
             <Pencil className="size-3.5" />
           </span>
         </Link>
-        <h1 className="mt-3 text-2xl font-extrabold">{usuario.nome}</h1>
+        <h1 className="mt-3 text-2xl font-light">{usuario.nome}</h1>
         <p className="text-sm text-suave">
           {usuario.email}
           {usuario.telefone && ` · ${formatarTelefone(usuario.telefone)}`}
@@ -53,8 +53,8 @@ export default async function PaginaPerfil() {
         {numeros.map(({ valor, rotulo, Icone, cor }) => (
           <div key={rotulo} className="cartao flex flex-col items-center px-2 py-4">
             <Icone className={`mb-1 size-5 ${cor}`} />
-            <p className="text-2xl font-extrabold tabular-nums">{valor}</p>
-            <p className="text-xs font-semibold text-suave">{rotulo}</p>
+            <p className="numero text-[34px] leading-tight">{valor}</p>
+            <p className="text-xs font-medium text-suave">{rotulo}</p>
           </div>
         ))}
       </section>
@@ -66,22 +66,22 @@ export default async function PaginaPerfil() {
         <Link href="/perfil/editar" className="flex min-h-16 items-center gap-4 px-4 active:bg-superficie-2">
           <UserPen className="size-5 text-suave" />
           <span className="min-w-0 flex-1">
-            <span className="block font-semibold">Editar perfil</span>
+            <span className="block font-medium">Editar perfil</span>
             <span className="block truncate text-sm text-suave">Foto, nome, e-mail e celular</span>
           </span>
-          {!usuario.emailVerificado && <span className="size-2.5 rounded-full bg-ouro" aria-label="E-mail não confirmado" />}
+          {!usuario.emailVerificado && <span className="size-2.5 rounded-full bg-perigo" aria-label="E-mail não confirmado" />}
           <ChevronRight className="size-5 text-suave" />
         </Link>
         <Link href="/familia" className="flex min-h-16 items-center gap-4 px-4 active:bg-superficie-2">
           <Users className="size-5 text-suave" />
           <span className="min-w-0 flex-1">
-            <span className="block font-semibold">Família</span>
+            <span className="block font-medium">Família</span>
             <span className="block truncate text-sm text-suave">{familia.nome} · convite e membros</span>
           </span>
           <ChevronRight className="size-5 text-suave" />
         </Link>
         <form action={sair}>
-          <button className="flex min-h-16 w-full items-center gap-4 px-4 text-left font-semibold text-perigo active:bg-superficie-2">
+          <button className="flex min-h-16 w-full items-center gap-4 px-4 text-left font-medium text-perigo active:bg-superficie-2">
             <LogOut className="size-5" /> Sair da conta
           </button>
         </form>

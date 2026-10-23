@@ -1,7 +1,8 @@
 import { Check } from "lucide-react";
 
-// Cor estável por pessoa, derivada do id — sem foto de perfil por enquanto.
-const CORES = ["#e8590c", "#1c7ed6", "#9c36b5", "#d6336c", "#0c8599", "#c08a00", "#5f3dc4", "#2b8a3e"];
+// Cor estável por pessoa, derivada do id. Tons sóbrios, de mesma luminosidade,
+// que convivem com o verde da marca sem competir com ele.
+const CORES = ["#2f6f5e", "#3e5c7a", "#6a4c7d", "#8a5a44", "#5b6b3a", "#3c6e88", "#7a4e5e", "#4e5d6c"];
 
 function corDe(id: string) {
   let h = 0;
@@ -24,7 +25,7 @@ export function Avatar({
     <span className="relative inline-block shrink-0" style={{ width: tamanho, height: tamanho }}>
       <span
         title={usuario.nome}
-        className={`grid size-full place-items-center rounded-full font-bold text-white ${
+        className={`grid size-full place-items-center rounded-full font-normal text-white ${
           marcado === false ? "opacity-45 grayscale" : ""
         } ${marcado ? "ring-[3px] ring-marca ring-offset-2 ring-offset-fundo" : ""}`}
         style={{ background: corDe(usuario.id), fontSize: tamanho * 0.42 }}

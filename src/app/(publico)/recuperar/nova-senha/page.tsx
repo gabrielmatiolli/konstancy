@@ -14,10 +14,10 @@ export default async function PaginaNovaSenha() {
   return (
     <div className="space-y-5">
       <div className="flex flex-col items-center text-center">
-        <span className="mb-3 grid size-14 place-items-center rounded-2xl bg-marca-suave text-marca-forte">
+        <span className="mb-3 grid size-14 place-items-center rounded-xl bg-marca-suave text-marca-forte">
           <LockKeyhole className="size-7" />
         </span>
-        <h1 className="text-xl font-extrabold">Crie uma senha nova</h1>
+        <h1 className="text-xl font-light">Crie uma senha nova</h1>
         <p className="mt-1 text-[15px] text-suave">Os outros aparelhos conectados vão precisar entrar de novo.</p>
       </div>
       <Formulario acao={redefinirSenha} textoBotao="Salvar e entrar" textoEnviando="Salvando…">

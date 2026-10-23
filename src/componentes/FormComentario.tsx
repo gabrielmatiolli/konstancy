@@ -16,7 +16,7 @@ export function FormComentario({ checkinId }: { checkinId: string }) {
   return (
     <form ref={form} action={enviar} className="space-y-2">
       <input type="hidden" name="checkinId" value={checkinId} />
-      <div className="flex items-center gap-2 rounded-full border border-borda bg-superficie py-1 pr-1 pl-4 focus-within:border-marca">
+      <div className="flex items-center gap-2 rounded-xl border border-borda bg-superficie py-1 pr-1 pl-4 focus-within:border-marca">
         <input
           name="texto"
           required
@@ -31,7 +31,7 @@ export function FormComentario({ checkinId }: { checkinId: string }) {
           type="submit"
           aria-label="Enviar comentário"
           disabled={pendente}
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-marca-forte text-white transition-transform active:scale-90 disabled:opacity-60 dark:text-marca-texto"
+          className="grid size-11 shrink-0 place-items-center rounded-[10px] bg-marca text-marca-texto transition-transform active:scale-90 disabled:opacity-60"
         >
           {pendente ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
         </button>

@@ -41,7 +41,7 @@ export default async function PaginaFamilia() {
 
       <section className="cartao space-y-4 p-5 text-center">
         <div>
-          <p className="font-bold">Convide quem falta</p>
+          <p className="font-normal">Convide quem falta</p>
           <p className="text-sm text-suave">Mande o link no WhatsApp ou passe o código.</p>
         </div>
         <CompartilharConvite codigo={familia.codigoConvite} familia={familia.nome} />
@@ -52,7 +52,7 @@ export default async function PaginaFamilia() {
             detalhe="O link e o código antigos param de funcionar."
             textoConfirmar="Gerar"
             perigo={false}
-            className="min-h-10 text-sm font-semibold text-suave"
+            className="min-h-10 text-sm font-medium text-suave"
           >
             Gerar novo código
           </BotaoConfirmar>
@@ -66,11 +66,11 @@ export default async function PaginaFamilia() {
             <li key={m.usuarioId} className="flex min-h-16 items-center gap-3 px-4 py-2">
               <Avatar usuario={m.usuario} tamanho={40} />
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">
+                <span className="block truncate font-medium">
                   {m.usuario.nome}
                   {m.usuarioId === usuario.id && <span className="text-suave"> (você)</span>}
                 </span>
-                {m.papel === "ADMIN" && <span className="text-xs font-semibold text-marca-forte">Administrador</span>}
+                {m.papel === "ADMIN" && <span className="text-xs font-medium text-marca-forte">Administrador</span>}
               </span>
               {admin && m.usuarioId !== usuario.id && (
                 <span className="flex gap-1">
@@ -81,7 +81,7 @@ export default async function PaginaFamilia() {
                       detalhe="Administradores mudam o nome, o convite e os membros."
                       textoConfirmar="Tornar admin"
                       perigo={false}
-                      className="min-h-10 rounded-full px-3 text-xs font-bold text-suave active:bg-superficie-2"
+                      className="min-h-10 rounded-lg px-3 text-xs font-normal text-suave active:bg-superficie-2"
                     >
                       Admin
                     </BotaoConfirmar>
@@ -91,7 +91,7 @@ export default async function PaginaFamilia() {
                     pergunta={`Remover ${m.usuario.nome}?`}
                     detalhe="Os check-ins dessa pessoa continuam salvos, mas ela deixa de ver a família."
                     textoConfirmar="Remover"
-                    className="min-h-10 rounded-full px-3 text-xs font-bold text-perigo active:bg-perigo/10"
+                    className="min-h-10 rounded-lg px-3 text-xs font-normal text-perigo active:bg-perigo/10"
                   >
                     Remover
                   </BotaoConfirmar>
@@ -130,9 +130,9 @@ export default async function PaginaFamilia() {
           <ul className="cartao divide-y divide-borda overflow-hidden">
             {minhasFamilias.map(({ familia: f }) => (
               <li key={f.id} className="flex min-h-14 items-center justify-between px-4">
-                <span className="font-semibold">{f.nome}</span>
+                <span className="font-medium">{f.nome}</span>
                 {f.id === familia.id ? (
-                  <span className="rounded-full bg-marca-suave px-3 py-1 text-xs font-bold text-marca-forte">Aberta</span>
+                  <span className="rounded-md bg-marca-suave px-2.5 py-1 text-xs font-normal text-marca-forte">Aberta</span>
                 ) : (
                   <form action={trocarFamiliaAtiva.bind(null, f.id)}>
                     <button className="btn-suave min-h-10 px-4 text-sm">Abrir</button>
@@ -145,7 +145,7 @@ export default async function PaginaFamilia() {
       )}
 
       <details className="cartao group p-4">
-        <summary className="flex min-h-8 cursor-pointer list-none items-center justify-between font-semibold">
+        <summary className="flex min-h-8 cursor-pointer list-none items-center justify-between font-medium">
           Entrar em outra família
           <span className="text-suave transition-transform group-open:rotate-45" aria-hidden>
             +
@@ -159,7 +159,7 @@ export default async function PaginaFamilia() {
               required
               autoCapitalize="characters"
               autoComplete="off"
-              className="campo text-center font-bold tracking-[0.3em] uppercase"
+              className="campo text-center font-normal tracking-[0.3em] uppercase"
             />
           </Formulario>
         </div>

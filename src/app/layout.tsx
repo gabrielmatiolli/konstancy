@@ -1,11 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree } from "next/font/google";
+import { Outfit } from "next/font/google";
 import { RegistrarServiceWorker } from "@/componentes/RegistrarServiceWorker";
 import "./globals.css";
 
 // Fonte variável servida pelo próprio app (sem Google em runtime): o mesmo
 // desenho em todo sistema, inclusive Android antigo sem fontes modernas.
-const figtree = Figtree({ variable: "--font-figtree", subsets: ["latin"], display: "swap" });
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: { default: "Konstancy", template: "%s · Konstancy" },
@@ -20,14 +25,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f6f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e1110" },
+    { media: "(prefers-color-scheme: light)", color: "#f4f7f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#07140f" },
   ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${figtree.variable} h-full`}>
+    <html lang="pt-BR" className={`${outfit.variable} h-full`}>
       <body className="min-h-full">
         {children}
         <RegistrarServiceWorker />
